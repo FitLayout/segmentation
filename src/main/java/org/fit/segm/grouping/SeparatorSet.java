@@ -3,10 +3,10 @@
  */
 package org.fit.segm.grouping;
 
-import java.awt.Color;
-import java.util.*;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Vector;
 
-import org.fit.cssbox.layout.BrowserCanvas;
 import org.fit.layout.model.Area;
 
 /**
@@ -28,7 +28,7 @@ public abstract class SeparatorSet
     protected static final int ART_SEP_WIDTH = 1;
     
 	/** The root of the area tree that will be processed */
-	protected AreaNode root;
+	protected GroupingAreaNode root;
 	
 	/** List of horizontal separators */
 	protected Vector<Separator> hsep;
@@ -42,7 +42,7 @@ public abstract class SeparatorSet
 	/**
 	 * Creates a new separator set with one horizontal and one vertical separator.
 	 */
-	public SeparatorSet(AreaNode root)
+	public SeparatorSet(GroupingAreaNode root)
 	{
         this.root = root;
         init(null);
@@ -51,7 +51,7 @@ public abstract class SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSet(AreaNode root, Area filter)
+    public SeparatorSet(GroupingAreaNode root, Area filter)
     {
         this.root = root;
         init(filter);
@@ -154,7 +154,7 @@ public abstract class SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area
      * 	are considered
      */
-    protected abstract void findSeparators(AreaNode area, Area filter);
+    protected abstract void findSeparators(GroupingAreaNode area, Area filter);
     
     /**
      * Applies various filters on the current separator sets in order to remove irrelevant separators or adjust the sizes.
@@ -215,7 +215,7 @@ public abstract class SeparatorSet
         {
             Separator sep = it.next();
             //Adaptive height threshold: use the font size of the box above the separator for determining the em size for the threshold  
-            AreaNode above = root.findContentAbove(sep);
+            GroupingAreaNode above = root.findContentAbove(sep);
             if (above != null)
                 hthreshold = (int) (above.getArea().getAverageFontSize() * HSEP_MIN_HEIGHT);
             else
@@ -314,18 +314,18 @@ public abstract class SeparatorSet
     /**
      * Creates a list of separators that are implemented as visual area borders.
      */
-    private void findAreaSeparators(AreaNode root)
+    private void findAreaSeparators(GroupingAreaNode root)
     {
         bsep = new Vector<Separator>();
         for (int i = 0; i < root.getChildCount(); i++)
-            analyzeAreaSeparators(root.getChildArea(i));
+            analyzeAreaSeparators((GroupingAreaNode) root.getChildArea(i));
     }
     
     /**
      * Analyzes the area and detects the separators that are implemented as borders
      * or background changes.
      */
-    private void analyzeAreaSeparators(AreaNode area)
+    private void analyzeAreaSeparators(GroupingAreaNode area)
     {
         boolean isep = area.explicitelySeparated() || area.isBackgroundSeparated();
         if (isep || area.separatedUp())

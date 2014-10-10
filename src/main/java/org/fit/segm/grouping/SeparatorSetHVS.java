@@ -20,7 +20,7 @@ public class SeparatorSetHVS extends SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSetHVS(AreaNode root)
+    public SeparatorSetHVS(GroupingAreaNode root)
     {
         super(root);
     }
@@ -28,7 +28,7 @@ public class SeparatorSetHVS extends SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSetHVS(AreaNode root, Area filter)
+    public SeparatorSetHVS(GroupingAreaNode root, Area filter)
     {
         super(root, filter);
     }
@@ -41,7 +41,7 @@ public class SeparatorSetHVS extends SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area
      *  are considered
      */
-    protected void findSeparators(AreaNode area, Area filter)
+    protected void findSeparators(GroupingAreaNode area, Area filter)
     {
         hsep = new Vector<Separator>();
         vsep = new Vector<Separator>();
@@ -91,7 +91,7 @@ public class SeparatorSetHVS extends SeparatorSet
      * Consider a new area -- updates the separators according to this new area
      * @param area The new area node to be considered
      */
-    private void considerArea(AreaNode area)
+    private void considerArea(GroupingAreaNode area)
     {
         //area coordinates
         int ax1 = area.getX();
@@ -175,12 +175,12 @@ public class SeparatorSetHVS extends SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area are considered
      * @return the number of processed subareas
      */
-    private int considerSubareas(AreaNode area, Area filter)
+    private int considerSubareas(GroupingAreaNode area, Area filter)
     {
         int ret = 0;
         for (int i = 0; i < area.getChildCount(); i++)
         {
-            AreaNode sub = area.getChildArea(i);
+            GroupingAreaNode sub = area.getChildArea(i);
             if (filter == null || filter.encloses(sub.getArea()))
             {
                 if (sub.getArea().isHorizontalSeparator())

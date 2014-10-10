@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import org.fit.cssbox.layout.BrowserCanvas;
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaNode;
 import org.fit.layout.model.BoxNode;
 import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
@@ -25,7 +26,7 @@ import org.fit.layout.model.Tag;
  * 
  * @author burgetr
  */
-public class AreaNode extends org.fit.layout.model.AreaNode
+public class GroupingAreaNode extends AreaNode
 {
     private static final long serialVersionUID = 3931378515695196845L;
 
@@ -57,10 +58,10 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     private boolean atomic = false;
     
     /** Previous box on the same line */
-    private AreaNode previousOnLine = null;
+    private GroupingAreaNode previousOnLine = null;
     
     /** Next box on the same line */
-    private AreaNode nextOnLine = null;
+    private GroupingAreaNode nextOnLine = null;
     
     /** The level of the most probable assigned tag (-1 means not computed yet) */
     private int taglevel = -1;
@@ -72,7 +73,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * Creates an area node from an area.
      * @param area The area to be contained in this node
      */
-    public AreaNode(Area area)
+    public GroupingAreaNode(Area area)
     {
         super(area);
         layoutType = LayoutType.NORMAL;
@@ -204,7 +205,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     {
         double ret = importance;
         for (int i = 0; i < getChildCount(); i++)
-            ret += getChildArea(i).getTotalImportance();
+            ret += ((GroupingAreaNode) getChildArea(i)).getTotalImportance();
         return ret;
     }
     
@@ -217,7 +218,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
         int cnt = 0;
         for (int i = 0; i < getChildCount(); i++)
         {
-            double imp = getChildArea(i).getAverageImportance();
+            double imp = ((GroupingAreaNode) getChildArea(i)).getAverageImportance();
             if (imp > 0)
             {
                 ret += imp;
@@ -252,7 +253,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
             ret = getArea().getBoxText();
         else
             for (int i = 0; i < getChildCount(); i++)
-                ret += getChildArea(i).getText();
+                ret += ((GroupingAreaNode) getChildArea(i)).getText();
         return ret;
     }
 
@@ -267,11 +268,11 @@ public class AreaNode extends org.fit.layout.model.AreaNode
         return ret;
     }
     
-    private void recursiveFindBoxes(AreaNode root, Vector<BoxNode> result)
+    private void recursiveFindBoxes(GroupingAreaNode root, Vector<BoxNode> result)
     {
         result.addAll(root.getArea().getBoxes());
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveFindBoxes(root.getChildArea(i), result);
+            recursiveFindBoxes((GroupingAreaNode) root.getChildArea(i), result);
     }
     
     /**
@@ -289,7 +290,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
                 return null;
         }
         else
-            return getChildArea(0).getFirstNestedBox();
+            return ((GroupingAreaNode) getChildArea(0)).getFirstNestedBox();
     }
     
     /** Computes the efficient background color by considering the parents if necessary */
@@ -300,28 +301,28 @@ public class AreaNode extends org.fit.layout.model.AreaNode
         else
         {
             if (getParentArea() != null)
-                return getParentArea().getEffectiveBackgroundColor();
+                return ((GroupingAreaNode) getParentArea()).getEffectiveBackgroundColor();
             else
                 return Color.WHITE; //use white as the default root color
         }
     }
 
-    public AreaNode getPreviousOnLine()
+    public GroupingAreaNode getPreviousOnLine()
 	{
 		return previousOnLine;
 	}
 
-	public void setPreviousOnLine(AreaNode previousOnLine)
+	public void setPreviousOnLine(GroupingAreaNode previousOnLine)
 	{
 		this.previousOnLine = previousOnLine;
 	}
 
-	public AreaNode getNextOnLine()
+	public GroupingAreaNode getNextOnLine()
 	{
 		return nextOnLine;
 	}
 
-	public void setNextOnLine(AreaNode nextOnLine)
+	public void setNextOnLine(GroupingAreaNode nextOnLine)
 	{
 		this.nextOnLine = nextOnLine;
 	}
@@ -350,14 +351,14 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * @param tag The required tag.
      * @return The most important leaf child area with that tag or <code>null</code> if there are no children with this tag.
      */
-    public AreaNode getMostImportantLeaf(Tag tag)
+    public GroupingAreaNode getMostImportantLeaf(Tag tag)
     {
         Enumeration<?> e = depthFirstEnumeration();
-        AreaNode best = null;
+        GroupingAreaNode best = null;
         double bestMarkedness = -1;
         while (e.hasMoreElements())
         {
-            AreaNode node = (AreaNode) e.nextElement();
+            GroupingAreaNode node = (GroupingAreaNode) e.nextElement();
             if (node.isLeaf() && node.hasTag(tag) && node.getMarkedness() > bestMarkedness)
             {
                 bestMarkedness = node.getMarkedness();
@@ -376,14 +377,14 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * @param horizontal Horizontal or vertical join?
      */
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-    public void joinArea(AreaNode other, Rectangular pos, boolean horizontal)
+    public void joinArea(GroupingAreaNode other, Rectangular pos, boolean horizontal)
     {
     	gp = pos;
     	if (other.children != null)
     	{
 	    	Vector adopt = new Vector(other.children);
 	    	for (Iterator it = adopt.iterator(); it.hasNext();)
-	    		add((AreaNode) it.next());
+	    		add((GroupingAreaNode) it.next());
     	}
     	getArea().join(other.getArea(), horizontal);
     	tags.addAll(other.getTags());
@@ -399,7 +400,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * @param name the name (identification) of the new area
      * @return the new AreaNode created in the tree or null, if nothing was created
      */ 
-    public AreaNode createSuperArea(Rectangular gp, Vector<AreaNode> selected, String name)
+    public GroupingAreaNode createSuperArea(Rectangular gp, Vector<GroupingAreaNode> selected, String name)
     {
         if (getChildCount() > 1 && selected.size() > 1 && selected.size() != getChildCount())
         {
@@ -409,7 +410,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
 	                             getArea().getX1() + grid.getColOfs(gp.getX2()+1) - 1,
 	                             getArea().getY1() + grid.getRowOfs(gp.getY2()+1) - 1);
 	        area.setName(name);
-        	AreaNode grp = new AreaNode(area);
+        	GroupingAreaNode grp = new GroupingAreaNode(area);
         	int index = getIndex(selected.firstElement());
             insert(grp, index);
         	grp.addAll(selected);
@@ -422,13 +423,13 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     }
     
     @SuppressWarnings("unused")
-    public void debugAreas(AreaNode sub)
+    public void debugAreas(GroupingAreaNode sub)
     {
         if (Config.DEBUG_AREAS && sub.getChildCount() == 0)
         {
             if (groups == null)
                 groups = Config.createGroupAnalyzer(this);
-            Vector<AreaNode> inside = new Vector<AreaNode>();
+            Vector<GroupingAreaNode> inside = new Vector<GroupingAreaNode>();
             createSeparators();
             groups.findSuperArea(sub, inside);
         }
@@ -445,11 +446,11 @@ public class AreaNode extends org.fit.layout.model.AreaNode
         //System.out.println("Result: " + getText());
     }
     
-    private void recursiveCollapseSubtree(AreaNode dest)
+    private void recursiveCollapseSubtree(GroupingAreaNode dest)
     {
         for (int i = 0; i < getChildCount(); i++)
         {
-            AreaNode child = getChildArea(i);
+            GroupingAreaNode child = getChildArea(i);
             child.recursiveCollapseSubtree(dest);
             dest.getArea().joinChild(child.getArea());
         }
@@ -518,7 +519,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     		int i = gx1;
     		while (i <= gx2)
     		{
-    			AreaNode node = grid.getNodeAt(i, gy);
+    			GroupingAreaNode node = grid.getNodeAt(i, gy);
     			//System.out.println("Search: " + i + ":" + gy + " = " + node);
     			if (node != null)
     			{
@@ -546,7 +547,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     		int i = gx1;
     		while (i <= gx2)
     		{
-    			AreaNode node = grid.getNodeAt(i, gy);
+    			GroupingAreaNode node = grid.getNodeAt(i, gy);
     			//System.out.println("Search: " + i + ":" + gy + " = " + node);
     			if (node != null)
     			{
@@ -574,7 +575,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     		int i = gy1;
     		while (i <= gy2)
     		{
-    			AreaNode node = grid.getNodeAt(gx, i);
+    			GroupingAreaNode node = grid.getNodeAt(gx, i);
     			if (node != null)
     			{
     				ret++;
@@ -601,7 +602,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     		int i = gy1;
     		while (i <= gy2)
     		{
-    			AreaNode node = grid.getNodeAt(gx, i);
+    			GroupingAreaNode node = grid.getNodeAt(gx, i);
     			if (node != null)
     			{
     				ret++;
@@ -620,14 +621,14 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * @param sep the separator 
      * @return the leaf area containing the box or <code>null</code> if there is nothing above the separator
      */
-    public AreaNode findContentAbove(Separator sep)
+    public GroupingAreaNode findContentAbove(Separator sep)
     {
         return recursiveFindAreaAbove(sep.getX1(), sep.getX2(), 0, sep.getY1());
     }
     
-    private AreaNode recursiveFindAreaAbove(int x1, int x2, int y1, int y2)
+    private GroupingAreaNode recursiveFindAreaAbove(int x1, int x2, int y1, int y2)
     {
-        AreaNode ret = null;
+        GroupingAreaNode ret = null;
         int maxx = x2;
         int miny = y1;
         Vector <BoxNode> boxes = getArea().getBoxes();
@@ -647,8 +648,8 @@ public class AreaNode extends org.fit.layout.model.AreaNode
 
         for (int i = 0; i < getChildCount(); i++)
         {
-            AreaNode child = getChildArea(i);
-            AreaNode area = child.recursiveFindAreaAbove(x1, x2, miny, y2);
+            GroupingAreaNode child = getChildArea(i);
+            GroupingAreaNode area = child.recursiveFindAreaAbove(x1, x2, miny, y2);
             if (area != null)
             {   
                 int bx = area.getX(); 
@@ -688,7 +689,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      */
     public double getParentPercentage()
     {
-        AreaNode parent = getParentArea();
+        GroupingAreaNode parent = getParentArea();
         if (parent != null)
             return (double) getArea().getSquareArea() / parent.getContentSquareArea();
         else
@@ -724,7 +725,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * @param other the other area to be compared
      * @return <code>true</code> if the areas are considered to have the same style
      */
-    public boolean hasSameStyle(AreaNode other)
+    public boolean hasSameStyle(GroupingAreaNode other)
     {
         return getStyle().isSameStyle(other.getStyle());
     }
@@ -787,7 +788,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      */
     private int isCentered(boolean askBefore, boolean askAfter)
     {
-        AreaNode parent = getParentArea();
+        GroupingAreaNode parent = getParentArea();
         if (parent != null)
         {
             int left = getX() - parent.getX();
@@ -805,23 +806,23 @@ public class AreaNode extends org.fit.layout.model.AreaNode
             else //may be centered - check the alignment
             {
                 //compare the alignent with the previous and/or the next child
-                AreaNode prev = null;
-                AreaNode next = null;
+                GroupingAreaNode prev = null;
+                GroupingAreaNode next = null;
                 int pc = 2; //previous centered?
                 int nc = 2; //next cenrered?
                 if (askBefore || askAfter)
                 {
                     if (askBefore)
                     {
-                        prev = (AreaNode) getPreviousSibling();
+                        prev = (GroupingAreaNode) getPreviousSibling();
                         while (prev != null && (pc = prev.isCentered(true, false)) == 2)
-                            prev = (AreaNode) prev.getPreviousSibling();
+                            prev = (GroupingAreaNode) prev.getPreviousSibling();
                     }
                     if (askAfter)
                     {
-                        next = (AreaNode) getNextSibling();
+                        next = (GroupingAreaNode) getNextSibling();
                         while (next != null && (nc = next.isCentered(false, true)) == 2)
-                            next = (AreaNode) next.getNextSibling();
+                            next = (GroupingAreaNode) next.getNextSibling();
                     }
                 }
                 
@@ -860,7 +861,7 @@ public class AreaNode extends org.fit.layout.model.AreaNode
      * Checks if the areas are left- or right-aligned.
      * @return 0 if not, 1 if yes, 2 if both left and right
      */
-    private int lrAligned(AreaNode a1, AreaNode a2)
+    private int lrAligned(GroupingAreaNode a1, GroupingAreaNode a2)
     {
         if (a1.getX() == a2.getX())
             return (a1.getX2() == a2.getX2()) ? 2 : 1;
@@ -873,11 +874,11 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     //======================================================================================
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public void sortChildren(Comparator<AreaNode> comparator)
+	public void sortChildren(Comparator<GroupingAreaNode> comparator)
     {
     	for (Enumeration e = children(); e.hasMoreElements(); )
     	{
-    		AreaNode chld = (AreaNode) e.nextElement();
+    		GroupingAreaNode chld = (GroupingAreaNode) e.nextElement();
     		if (!chld.isAtomic())
     		    chld.sortChildren(comparator);
     	}

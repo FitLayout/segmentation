@@ -30,7 +30,7 @@ public class AreaStyle
         this.backgroundColor = backgroundColor;
     }
     
-    public AreaStyle(AreaNode source)
+    public AreaStyle(GroupingAreaNode source)
     {
         this.averageFontSize = source.getArea().getAverageFontSize();
         this.averageFontWeight = source.getArea().getAverageFontWeight();

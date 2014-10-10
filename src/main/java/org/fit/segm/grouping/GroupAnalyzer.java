@@ -9,7 +9,6 @@ import java.util.Vector;
 
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaGrid;
-import org.fit.layout.model.AreaNode;
 
 /**
  * A general analyzer to find area groups
@@ -18,16 +17,16 @@ import org.fit.layout.model.AreaNode;
  */
 public class GroupAnalyzer
 {
-    protected AreaNode parent;
+    protected GroupingAreaNode parent;
     protected AreaGrid grid; 
     
-    public GroupAnalyzer(AreaNode parent)
+    public GroupAnalyzer(GroupingAreaNode parent)
     {
         this.parent = parent;
         grid = parent.getGrid();
     }
     
-    public AreaNode getParent()
+    public GroupingAreaNode getParent()
     {
         return parent;
     }
@@ -42,12 +41,12 @@ public class GroupAnalyzer
      * that should be contained in the new area
      * @return the new empty
      */
-    public AreaNode findSuperArea(AreaNode sub, Vector<AreaNode> selected)
+    public GroupingAreaNode findSuperArea(GroupingAreaNode sub, Vector<GroupingAreaNode> selected)
     {
     	/* This is a simple testing SuperArea implementation. It groups each 
     	 * subarea with its first sibling area.*/ 
-        AreaNode ret = new AreaNode(new Area(0, 0, 0, 0));
-        AreaNode sibl = (AreaNode) sub.getNextSibling();
+        GroupingAreaNode ret = new GroupingAreaNode(new Area(0, 0, 0, 0));
+        GroupingAreaNode sibl = (GroupingAreaNode) sub.getNextSibling();
         selected.removeAllElements();
         selected.add(sub);
         if (sibl != null)

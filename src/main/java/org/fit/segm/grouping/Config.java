@@ -44,7 +44,7 @@ public class Config
      * @param root the root area for separator detection
      * @return the created group analyzer
      */
-    public static GroupAnalyzer createGroupAnalyzer(AreaNode root)
+    public static GroupAnalyzer createGroupAnalyzer(GroupingAreaNode root)
     {
         //return new GroupAnalyzerByGrouping(root);
         //return new GroupAnalyzerBySeparators(root);
@@ -57,7 +57,7 @@ public class Config
      * @param root the root area
      * @return the created separator set
      */
-    public static SeparatorSet createSeparators(AreaNode root)
+    public static SeparatorSet createSeparators(GroupingAreaNode root)
     {
         SeparatorSet sset;
         //sset = new SeparatorSetHV(root);
