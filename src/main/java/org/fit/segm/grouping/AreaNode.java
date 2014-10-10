@@ -3,16 +3,25 @@
  *
  * Created on 28.6.2006, 15:13:48 by burgetr
  */
-package org.fit.segm;
+package org.fit.segm.grouping;
 
 import java.awt.Color;
 import java.awt.Graphics;
+import java.util.Comparator;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Vector;
 
 import org.fit.cssbox.layout.BrowserCanvas;
+import org.fit.layout.model.Area;
+import org.fit.layout.model.BoxNode;
 import org.fit.layout.model.Rectangular;
+import org.fit.layout.model.Tag;
 
 /**
  * A node in the area tree. The nested areas are laid out in a grid.
+ * TODO rename to GroupingAreaNode or so?
  * 
  * @author burgetr
  */
@@ -25,9 +34,6 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     
     /** Position in the grid */
     private Rectangular gp;
-    
-    /** A grid of inserted elements */
-    private AreaGrid grid;
     
     /** Set of separators */
     private SeparatorSet seps;
@@ -56,9 +62,6 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     /** Next box on the same line */
     private AreaNode nextOnLine = null;
     
-    /** Assigned tags */
-    private Set<Tag> tags;
-    
     /** The level of the most probable assigned tag (-1 means not computed yet) */
     private int taglevel = -1;
     
@@ -73,9 +76,6 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     {
         super(area);
         layoutType = LayoutType.NORMAL;
-        grid = null;
-        gp = new Rectangular();
-        tags = new HashSet<Tag>();
     }
 
     public String toString()
@@ -107,22 +107,6 @@ public class AreaNode extends org.fit.layout.model.AreaNode
         this.layoutType = layoutType;
     }
 
-    /**
-     * Creates the grid of areas from the child areas.
-     */
-    public void createGrid()
-    {
-        grid = new AreaGrid(this);
-    }
-    
-    /**
-     * @return The grid of areas
-     */
-    public AreaGrid getGrid()
-    {
-        return grid;
-    }
-    
     /**
      * Creates a set of the horizontal and vertical separators
      */
@@ -341,70 +325,6 @@ public class AreaNode extends org.fit.layout.model.AreaNode
 	{
 		this.nextOnLine = nextOnLine;
 	}
-
-	/**
-     * Adds a tag to this area.
-     * @param tag the tag to be added.
-     */
-    public void addTag(Tag tag)
-    {
-        tags.add(tag);
-    }
-    
-    /**
-     * Tests whether the area has this tag.
-     * @param tag the tag to be tested.
-     * @return <code>true</code> if the area has this tag
-     */
-    public boolean hasTag(Tag tag)
-    {
-        return tags.contains(tag);
-    }
-    
-    public void removeAllTags(Collection<Tag> c)
-    {
-        tags.removeAll(c);
-    }
-    
-    /**
-     * Tests whether the area or any of its direct child areas have the given tag.
-     * @param tag the tag to be tested.
-     * @return <code>true</code> if the area or its direct child areas have the given tag
-     */
-    public boolean containsTag(Tag tag)
-    {
-        if (hasTag(tag))
-            return true;
-        else
-            //return false;
-        {
-            for (int i = 0; i < getChildCount(); i++)
-                if (getChildArea(i).hasTag(tag))
-                    return true;
-            return false;
-        }
-    }
-    
-    /**
-     * Obtains the set of tags assigned to the area.
-     * @return a set of tags
-     */
-    public Set<Tag> getTags()
-    {
-        return tags;
-    }
-    
-    /**
-     * Obtains all the tags assigned to this area and its child areas (not all descendant areas).
-     * @return a set of tags
-     */
-    public Set<Tag> getAllTags()
-    {
-        Set<Tag> ret = new HashSet<Tag>(tags);
-        for (int i = 0; i < getChildCount(); i++)
-            ret.addAll(getChildArea(i).getTags());
-        return ret;
-    }
     
     /**
      * Obtains the level of the most probable tag assigned to the area. This value is computed from outsied,
@@ -713,8 +633,8 @@ public class AreaNode extends org.fit.layout.model.AreaNode
         Vector <BoxNode> boxes = getArea().getBoxes();
         for (BoxNode box : boxes)
         {
-            int bx = box.getBounds().x1; 
-            int by = box.getBounds().y2; 
+            int bx = box.getBounds().getX1();
+            int by = box.getBounds().getX2();
             if ((bx >= x1 && bx <= x2 && by < y2) &&  //is placed above
                     (by > miny ||
                      (by == miny && bx < maxx)))
@@ -749,115 +669,6 @@ public class AreaNode extends org.fit.layout.model.AreaNode
     }
 
     //====================================================================================
-    
-    /**
-     * @return Returns the height of the area in the grid height in rows
-     */
-    public int getGridHeight()
-    {
-        return gp.getHeight();
-    }
-
-    /**
-     * @return Returns the width of the area in the grid in rows
-     */
-    public int getGridWidth()
-    {
-        return gp.getWidth();
-    }
-
-    /**
-     * @return Returns the gridX.
-     */
-    public int getGridX()
-    {
-        return gp.getX1();
-    }
-
-    /**
-     * @param gridX The gridX to set.
-     */
-    public void setGridX(int gridX)
-    {
-        gp.setX1(gridX);
-    }
-
-    /**
-     * @return Returns the gridY.
-     */
-    public int getGridY()
-    {
-        return gp.getY1();
-    }
-
-    /**
-     * @param gridY The gridY to set.
-     */
-    public void setGridY(int gridY)
-    {
-        gp.setY1(gridY);
-    }
-    
-    /**
-     * @return the position of this area in the grid of its parent area
-     */
-    public Rectangular getGridPosition()
-    {
-    	return gp;
-    }
-    
-    /**
-     * Sets the position in the parent area grid for this area
-     * @param pos the position
-     */
-    public void setGridPosition(Rectangular pos)
-    {
-        gp = new Rectangular(pos);
-    }
-    
-    /**
-     * Returns the child area at the specified grid position or null, if there is no
-     * child area at this position.
-     */
-    public AreaNode getChildAtGridPos(int x, int y)
-    {
-        for (int i = 0; i < getChildCount(); i++)
-        {
-            AreaNode child = getChildArea(i);
-            if (child.getGridPosition().contains(x, y))
-                return child;
-        }
-        return null;
-    }
-    
-    /**
-     * Returns the child areas whose absolute coordinates intersect with the specified rectangle.
-     */
-    public Vector<AreaNode> getChildNodesInside(Rectangular r)
-    {
-        Vector<AreaNode> ret = new Vector<AreaNode>();
-        for (int i = 0; i < getChildCount(); i++)
-        {
-            AreaNode child = getChildArea(i);
-            if (child.getArea().getBounds().intersects(r))
-                ret.add(child);
-        }
-        return ret;
-    }
-    
-    /**
-     * Check if there are some children in the given subarea of the area.
-     */
-    public boolean isAreaEmpty(Rectangular r)
-    {
-        for (int i = 0; i < getChildCount(); i++)
-        {
-            AreaNode child = getChildArea(i);
-            if (child.getArea().getBounds().intersects(r))
-                return false;
-        }
-        return true;
-    }
     
     /**
      * Computes the total square area occupied by the area contents.

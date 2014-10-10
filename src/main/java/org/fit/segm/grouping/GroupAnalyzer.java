@@ -5,14 +5,11 @@
  */
 package org.fit.segm.grouping;
 
-import java.awt.Color;
 import java.util.Vector;
 
-import org.fit.cssbox.layout.BrowserCanvas;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaGrid;
 import org.fit.layout.model.AreaNode;
-import org.fit.layout.model.Rectangular;
 
 /**
  * A general analyzer to find area groups
@@ -62,7 +59,7 @@ public class GroupAnalyzer
     
     //===================================================================================
     
-    protected Color debugColor = new Color(0, 0, 255, 20);
+    /*protected Color debugColor = new Color(0, 0, 255, 20);
     
     protected void dispCell(int x, int y)
     {
@@ -95,7 +92,7 @@ public class GroupAnalyzer
         try {
             Thread.sleep(ms);
         } catch(InterruptedException e) {}
-    }
+    }*/
 
     
 }
