@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.fit.layout.model.Area;
+import org.fit.layout.impl.Area;
 
 /**
  * A generic set of horizontal and vertical separators for a page.

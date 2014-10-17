@@ -8,7 +8,7 @@ package org.fit.segm.grouping;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.fit.layout.model.Area;
+import org.fit.layout.impl.Area;
 import org.fit.layout.model.Rectangular;
 
 /**

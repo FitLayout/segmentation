@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Vector;
 
 import org.fit.cssbox.layout.BrowserCanvas;
-import org.fit.layout.model.Area;
-import org.fit.layout.model.AreaNode;
-import org.fit.layout.model.BoxNode;
+import org.fit.layout.impl.Area;
+import org.fit.layout.impl.AreaNode;
+import org.fit.layout.impl.BoxNode;
+import org.fit.layout.impl.Tag;
 import org.fit.layout.model.Rectangular;
-import org.fit.layout.model.Tag;
 
 /**
  * A node in the area tree. The nested areas are laid out in a grid.

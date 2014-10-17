@@ -7,8 +7,8 @@ package org.fit.segm.grouping;
 
 import java.util.Vector;
 
-import org.fit.layout.model.Area;
-import org.fit.layout.model.AreaGrid;
+import org.fit.layout.impl.Area;
+import org.fit.layout.impl.AreaGrid;
 
 /**
  * A general analyzer to find area groups
