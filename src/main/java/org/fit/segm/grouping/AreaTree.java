@@ -25,7 +25,7 @@ public class AreaTree implements SearchableAreaContainer
     protected BoxTree boxtree;
     
     /** The root node area */
-    protected Area rootarea;
+    protected AreaImpl rootarea;
     
     //=================================================================================
     
@@ -36,7 +36,7 @@ public class AreaTree implements SearchableAreaContainer
     public AreaTree(BoxTree srctree)
     {
         boxtree = srctree;
-        rootarea = new Area(0, 0, 0, 0);
+        rootarea = new AreaImpl(0, 0, 0, 0);
         root = new AreaNode(rootarea);
     }
     
@@ -54,12 +54,12 @@ public class AreaTree implements SearchableAreaContainer
      */
     public AreaNode findBasicAreas()
     {
-        rootarea = new Area(0, 0, 0, 0);
+        rootarea = new AreaImpl(0, 0, 0, 0);
         root = new AreaNode(rootarea);
         for (int i = 0; i < boxtree.getRoot().getChildCount(); i++)
         {
             AreaNode sub;
-            sub = new AreaNode(new Area(boxtree.getRoot().getChildBox(i)));
+            sub = new AreaNode(new AreaImpl(boxtree.getRoot().getChildBox(i)));
             if (sub.getWidth() > 1 || sub.getHeight() > 1)
             {
                 findStandaloneAreas(boxtree.getRoot().getChildBox(i), sub);
@@ -90,7 +90,7 @@ public class AreaTree implements SearchableAreaContainer
 		        {
 	                if (child.isVisuallySeparated())
 	                {
-	                    AreaNode newnode = new AreaNode(new Area(child));
+	                    AreaNode newnode = new AreaNode(new AreaImpl(child));
 	                    if (newnode.getWidth() > 1 || newnode.getHeight() > 1)
 	                    {
                             findStandaloneAreas(child, newnode);

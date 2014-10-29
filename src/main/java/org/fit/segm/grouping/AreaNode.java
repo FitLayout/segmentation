@@ -9,18 +9,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Vector;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+
 /**
- * A node in the area tree that can be placed in a grid.
+ * A node that holds an area in the tree.
  * 
  * @author burgetr
  */
-public class AreaNode extends TreeNode<Area>
+public class AreaNode extends DefaultMutableTreeNode
 {
     private static final long serialVersionUID = 3342686210987580546L;
     
     //====================================================================================
     
-    public AreaNode(Area area)
+    public AreaNode(AreaImpl area)
     {
         super(area);
         area.setNode(this);
@@ -32,9 +34,9 @@ public class AreaNode extends TreeNode<Area>
      * Obtains the contained area.
      * @return the contained area
      */
-    public Area getArea()
+    public AreaImpl getArea()
     {
-        return getUserObject();
+        return (AreaImpl) getUserObject();
     }
     
     /**
@@ -87,42 +89,6 @@ public class AreaNode extends TreeNode<Area>
     public Vector<? extends AreaNode> getChildAreas()
     {
         return this.children;
-    }
-    
-    //====================================================================================
-    // absolute coordinates
-    //====================================================================================
-    
-    //TODO unify name to getX1()
-    public int getX()
-    {
-        return getArea().getX1();
-    }
-    
-    //TODO unify name to getY1()
-    public int getY()
-    {
-        return getArea().getY1();
-    }
-    
-    public int getX2()
-    {
-        return getArea().getX2();
-    }
-    
-    public int getY2()
-    {
-        return getArea().getY2();
-    }
-    
-    public int getWidth()
-    {
-        return getArea().getWidth();
-    }
-    
-    public int getHeight()
-    {
-        return getArea().getHeight();
     }
     
 

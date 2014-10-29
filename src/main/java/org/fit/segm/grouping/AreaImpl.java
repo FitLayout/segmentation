@@ -5,24 +5,26 @@
  */
 package org.fit.segm.grouping;
 
-import java.util.*;
-import java.awt.*;
+import java.awt.Color;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
 
-import org.fit.cssbox.layout.BlockReplacedBox;
-import org.fit.cssbox.layout.Box;
-import org.fit.cssbox.layout.BrowserCanvas;
-import org.fit.cssbox.layout.ElementBox;
-import org.fit.cssbox.layout.InlineReplacedBox;
-import org.fit.cssbox.layout.ReplacedContent;
-import org.fit.cssbox.layout.TextBox;
+import org.fit.layout.model.Area;
+import org.fit.layout.model.Box;
+import org.fit.layout.model.ContentObject;
 import org.fit.layout.model.Rectangular;
+import org.fit.layout.model.Tag;
 
 /**
  * An area containing several visual boxes.
  * 
  * @author radek
  */
-public class Area
+public class AreaImpl implements Area
 {
     private static int nextid = 1;
     
@@ -40,11 +42,10 @@ public class Area
     /** Assigned tags */
     protected Set<Tag> tags;
     
-    
 	/**
 	 * The visual boxes that form this area.
 	 */
-	private Vector<BoxNode> boxes;
+	private Vector<Box> boxes;
 	
 	/**
 	 * Declared bounds of the area.
@@ -103,10 +104,10 @@ public class Area
     /** 
      * Creates an empty area of a given size
      */
-    public Area(int x1, int y1, int x2, int y2)
+    public AreaImpl(int x1, int y1, int x2, int y2)
 	{
         id = nextid++;
-		boxes = new Vector<BoxNode>();
+		boxes = new Vector<Box>();
 		bounds = new Rectangular(x1, y1, x2, y2);
         name = null;
         btop = false;
@@ -122,10 +123,10 @@ public class Area
     /** 
      * Creates an empty area of a given size
      */
-    public Area(Rectangular r)
+    public AreaImpl(Rectangular r)
     {
         id = nextid++;
-        boxes = new Vector<BoxNode>();
+        boxes = new Vector<Box>();
         bounds = new Rectangular(r);
         name = null;
         btop = false;
@@ -142,10 +143,10 @@ public class Area
      * Creates an area from a single box. Update the area bounds and name accordingly.
      * @param box The source box that will be contained in this area
      */
-    public Area(BoxNode box)
+    public AreaImpl(Box box)
     {
         id = nextid++;
-        boxes = new Vector<BoxNode>();
+        boxes = new Vector<Box>();
         addBox(box); //expands the content bounds appropriately
         bounds = new Rectangular(contentBounds);
         this.name = box.toString();
@@ -153,7 +154,7 @@ public class Area
         bleft = box.hasLeftBorder();
         bright = box.hasRightBorder();
         bbottom = box.hasBottomBorder();
-        bgcolor = box.getBgcolor();
+        bgcolor = box.getBackgroundColor();
         backgroundSeparated = box.isBackgroundSeparated();
         grid = null;
         gp = new Rectangular();
@@ -164,20 +165,20 @@ public class Area
      * Creates an area from a a list of boxes. Update the area bounds and name accordingly.
      * @param boxes The source boxes that will be contained in this area
      */
-    public Area(Vector<BoxNode> boxlist)
+    public AreaImpl(Vector<Box> boxlist)
     {
         id = nextid++;
-        boxes = new Vector<BoxNode>(boxlist.size());
-        for (BoxNode box : boxlist)
+        boxes = new Vector<Box>(boxlist.size());
+        for (Box box : boxlist)
             addBox(box); //expands the content bounds appropriately
-        BoxNode box = boxlist.firstElement();
+        Box box = boxlist.firstElement();
         bounds = new Rectangular(contentBounds);
         this.name = box.toString();
         btop = box.hasTopBorder();
         bleft = box.hasLeftBorder();
         bright = box.hasRightBorder();
         bbottom = box.hasBottomBorder();
-        bgcolor = box.getBgcolor();
+        bgcolor = box.getBackgroundColor();
         backgroundSeparated = box.isBackgroundSeparated();
         grid = null;
         gp = new Rectangular();
@@ -188,10 +189,10 @@ public class Area
      * Creates a copy of another area.
      * @param area The source area
      */
-    public Area(Area src)
+    public AreaImpl(AreaImpl src)
     {
         id = nextid++;
-        boxes = new Vector<BoxNode>(src.getBoxes());
+        boxes = new Vector<Box>(src.getBoxes());
         contentBounds = (src.contentBounds == null) ? null : new Rectangular(src.contentBounds);
         bounds = new Rectangular(src.bounds);
         name = (src.name == null) ? null : new String(src.name);
@@ -246,7 +247,7 @@ public class Area
      * @param horizontal If true, the areas are joined horizontally.
      * This influences the resulting area borders. If false, the areas are joined vertically.
      */
-    public void join(Area other, boolean horizontal)
+    public void join(AreaImpl other, boolean horizontal)
     {
     	bounds.expandToEnclose(other.bounds);
     	name = name + " . " + other.name;
@@ -286,7 +287,7 @@ public class Area
      * Joins a child area to this area. Updates the bounds and the name accordingly.
      * @param other The child area to be joined to this area.
      */
-    public void joinChild(Area other)
+    public void joinChild(AreaImpl other)
     {
         //TODO obsah se neimportuje?
         bounds.expandToEnclose(other.bounds);
@@ -348,7 +349,7 @@ public class Area
      * Add the box node to the area if its bounds are inside of the area bounds.
      * @param node The box node to be added
      */
-    public void chooseBox(BoxNode node)
+    public void chooseBox(Box node)
     {
     	if (bounds.encloses(node.getVisualBounds()))
     		addBox(node);
@@ -358,7 +359,7 @@ public class Area
      * Returns a vector of boxes that are inside of this area
      * @return A vector containing the {@link org.burgetr.segm.BoxNode BoxNode} objects
      */
-    public Vector<BoxNode> getBoxes()
+    public Vector<Box> getBoxes()
     {
     	return boxes;
     }
@@ -374,8 +375,15 @@ public class Area
     	bright = right;
     }
 
+    @Override
+    public int getChildCount()
+    {
+        return getNode().getChildCount();
+    }
+    
 	//=================================================================================
 	
+    @Override
     public Rectangular getBounds()
     {
     	return bounds;
@@ -391,31 +399,37 @@ public class Area
         return contentBounds;
     }
 	
+    @Override
     public int getX1()
     {
     	return bounds.getX1();
     }
     
+    @Override
     public int getY1()
     {
     	return bounds.getY1();
     }
     
+    @Override
     public int getX2()
     {
     	return bounds.getX2();
     }
     
+    @Override
     public int getY2()
     {
     	return bounds.getY2();
     }
     
+    @Override
     public int getWidth()
     {
     	return bounds.getWidth();
     }
     
+    @Override
     public int getHeight()
     {
     	return bounds.getHeight();
@@ -430,31 +444,37 @@ public class Area
         return bounds.getArea();
     }
     
+    @Override
     public boolean hasTopBorder()
     {
         return btop;
     }
     
+    @Override
     public boolean hasLeftBorder()
     {
         return bleft;
     }
     
+    @Override
     public boolean hasRightBorder()
     {
         return bright;
     }
     
+    @Override
     public boolean hasBottomBorder()
     {
         return bbottom;
     }
     
+    @Override
     public Color getBackgroundColor()
     {
     	return bgcolor;
     }
     
+    @Override
     public boolean isBackgroundSeparated()
     {
         return backgroundSeparated;
@@ -466,13 +486,13 @@ public class Area
      * @return true if the areas are both transparent or they have the same
      * background color declared
      */
-    public boolean hasSameBackground(Area other)
+    public boolean hasSameBackground(AreaImpl other)
     {
         return (bgcolor == null && other.bgcolor == null) || 
                (bgcolor != null && other.bgcolor != null && bgcolor.equals(other.bgcolor));
     }
     
-    public boolean encloses(Area other)
+    public boolean encloses(AreaImpl other)
     {
     	return bounds.encloses(other.bounds);
     }
@@ -494,22 +514,27 @@ public class Area
      */
     public boolean containsText()
     {
-        boolean ret = false;
-        for (BoxNode root : boxes)
+        for (Box root : boxes)
         {
-            //scan all the leaf nodes and seek for text
-            Enumeration<?> sub = root.depthFirstEnumeration();
-            while (sub.hasMoreElements())
-            {
-                BoxNode node = (BoxNode) sub.nextElement();
-                if (node.isLeaf() && node.getBox() != null && node.getBox() instanceof TextBox)
-                {
-                    if (((TextBox) node.getBox()).getText().trim().length() > 0)
-                        ret = true;
-                }
-            }
+            if (recursiveContainsText(root))
+                return true;
         }
-        return ret;
+        return false;
+    }
+    
+    private boolean recursiveContainsText(Box root)
+    {
+        if (root.getChildCount() == 0)
+        {
+            return root.getText().trim().length() > 0;
+        }
+        else
+        {
+            for (int i = 0; i < root.getChildCount(); i++)
+                if (recursiveContainsText(root.getChildBox(i)))
+                    return true;
+            return false;
+        }
     }
     
     /**
@@ -518,14 +543,11 @@ public class Area
     public boolean isReplaced()
     {
         boolean empty = true;
-        for (BoxNode root : boxes)
+        for (Box root : boxes)
         {
-            if (root.getBox() != null)
-            {
-                empty = false;
-                if (!root.getBox().isReplaced())
-                    return false;
-            }
+            empty = false;
+            if (root.getContentObject() == null)
+                return false;
         }
         return !empty;
     }
@@ -538,7 +560,7 @@ public class Area
     {
         StringBuilder ret = new StringBuilder();
         boolean start = true;
-        for (Iterator<BoxNode> it = boxes.iterator(); it.hasNext(); )
+        for (Iterator<Box> it = boxes.iterator(); it.hasNext(); )
         {
             if (!start) ret.append(' ');
             else start = false;
@@ -554,7 +576,7 @@ public class Area
     public int getTextLength()
     {
         int ret = 0;
-        for (BoxNode box : boxes)
+        for (Box box : boxes)
         {
             ret += box.getText().length();
         }
@@ -564,35 +586,33 @@ public class Area
     /**
      * @return true if the area contains any text
      */
-	public ReplacedContent getReplacedContent()
+	public ContentObject getReplacedContent()
     {
-        ReplacedContent ret = null;
-        for (Iterator<BoxNode> it = boxes.iterator(); it.hasNext(); )
+        for (Iterator<Box> it = boxes.iterator(); it.hasNext(); )
         {
-            BoxNode root = it.next();
-            //scan all the leaf nodes and seek for text
-            Enumeration<?> sub = root.depthFirstEnumeration();
-            while (sub.hasMoreElements())
-            {
-                BoxNode node = (BoxNode) sub.nextElement();
-                if (node.isLeaf() && node.getBox() != null)
-                {
-	                if 	(node.getBox() instanceof InlineReplacedBox)
-	                {
-	                	ret = ((InlineReplacedBox) node.getBox()).getContentObj();
-	                	if (ret != null)
-	                		break;
-	                }
-	                if 	(node.getBox() instanceof BlockReplacedBox)
-	                {
-	                	ret = ((BlockReplacedBox) node.getBox()).getContentObj();
-	                	if (ret != null)
-	                		break;
-	                }
-                }
-            }
+            ContentObject obj = recursiveGetReplacedContent(it.next());
+            if (obj != null)
+                return obj;
         }
-        return ret;
+        return null;
+    }
+    
+    private ContentObject recursiveGetReplacedContent(Box root)
+    {
+        if (root.getChildCount() == 0)
+        {
+            return root.getContentObject();
+        }
+        else
+        {
+            for (int i = 0; i < root.getChildCount(); i++)
+            {
+                ContentObject obj = recursiveGetReplacedContent(root.getChildBox(i));
+                if (obj != null)
+                    return obj;
+            }
+            return null;
+        }
     }
     
     /**
@@ -634,14 +654,14 @@ public class Area
     }
     
     /**
-     * Returns the size height declared for the corresponding box. If there are multiple boxes,
+     * Returns the size height declared for the first box. If there are multiple boxes,
      * the first one is used. If there are no boxes (an artificial area), 0 is returned.
      * @return 
      */
     public double getDeclaredFontSize()
     {
         if (boxes.size() > 0)
-            return boxes.firstElement().getBox().getVisualContext().getFont().getSize2D();
+            return boxes.firstElement().getFontSize();
         else
             return 0;
     }
@@ -694,10 +714,10 @@ public class Area
         {
             double sum = 0;
             int len = 0;
-            for (BoxNode box : boxes)
+            for (Box box : boxes)
             {
                 int l = box.getText().length(); 
-                sum += colorLuminosity(box.getBox().getVisualContext().getColor()) * l;
+                sum += colorLuminosity(box.getColor()) * l;
                 len += l;
             }
             return sum / len;
@@ -708,7 +728,7 @@ public class Area
      * Updates the average values when a new area is added or joined
      * @param other the other area
      */
-    public void updateAverages(Area other)
+    public void updateAverages(AreaImpl other)
     {
         fontSizeCnt += other.fontSizeCnt;
         fontSizeSum += other.fontSizeSum;
@@ -808,11 +828,11 @@ public class Area
      * Returns the child area at the specified grid position or null, if there is no
      * child area at this position.
      */
-    public Area getChildAtGridPos(int x, int y)
+    public AreaImpl getChildAtGridPos(int x, int y)
     {
         for (int i = 0; i < getNode().getChildCount(); i++)
         {
-            Area child = getNode().getChildArea(i).getArea();
+            AreaImpl child = getNode().getChildArea(i).getArea();
             if (child.getGridPosition().contains(x, y))
                 return child;
         }
@@ -822,12 +842,12 @@ public class Area
     /**
      * Returns the child areas whose absolute coordinates intersect with the specified rectangle.
      */
-    public Vector<Area> getChildNodesInside(Rectangular r)
+    public Vector<AreaImpl> getChildNodesInside(Rectangular r)
     {
-        Vector<Area> ret = new Vector<Area>();
+        Vector<AreaImpl> ret = new Vector<AreaImpl>();
         for (int i = 0; i < getNode().getChildCount(); i++)
         {
-            Area child = getNode().getChildArea(i).getArea();
+            AreaImpl child = getNode().getChildArea(i).getArea();
             if (child.getBounds().intersects(r))
                 ret.add(child);
         }
@@ -856,6 +876,7 @@ public class Area
      * Adds a tag to this area.
      * @param tag the tag to be added.
      */
+    @Override
     public void addTag(Tag tag)
     {
         tags.add(tag);
@@ -866,6 +887,7 @@ public class Area
      * @param tag the tag to be tested.
      * @return <code>true</code> if the area has this tag
      */
+    @Override
     public boolean hasTag(Tag tag)
     {
         return tags.contains(tag);
@@ -902,6 +924,7 @@ public class Area
      * Obtains the set of tags assigned to the area.
      * @return a set of tags
      */
+    @Override
     public Set<Tag> getTags()
     {
         return tags;
@@ -996,7 +1019,7 @@ public class Area
 	 * Adds a new box to the area and updates the area bounds.
 	 * @param box the new box to add
 	 */
-	private void addBox(BoxNode box)
+	private void addBox(Box box)
 	{
 		boxes.add(box);
 

@@ -38,11 +38,11 @@ public class AreaGrid
     private int[] rows;
     
     /** Enclosing visual area */
-    private Area parent;
+    private AreaImpl parent;
     
     //================================================================================
     
-    public AreaGrid(Area area)
+    public AreaGrid(AreaImpl area)
     {
         parent = area;
         calculateColumns();
@@ -105,13 +105,13 @@ public class AreaGrid
      * @return the node at the specified position or null if there is no node
      */
     @SuppressWarnings("rawtypes")
-    public Area getAreaAt(int x, int y)
+    public AreaImpl getAreaAt(int x, int y)
     {
         if (x < width && y < height)
         {
             for (Enumeration e = parent.getNode().children(); e.hasMoreElements(); )
             {
-                Area node = ((AreaNode) e.nextElement()).getArea();
+                AreaImpl node = ((AreaNode) e.nextElement()).getArea();
                 if (x >= node.getGridX() && x < node.getGridX() + node.getGridWidth() &&
                     y >= node.getGridY() && y < node.getGridY() + node.getGridHeight())
                     return node;
@@ -263,7 +263,7 @@ public class AreaGrid
         int pi = 0;
         for (Enumeration e = parent.getNode().children(); e.hasMoreElements(); pi += 2)
         {
-            Area area = ((AreaNode) e.nextElement()).getArea();
+            AreaImpl area = ((AreaNode) e.nextElement()).getArea();
             points[pi] = new GridPoint(area.getX1(), area, true);
             points[pi+1] = new GridPoint(area.getX2() + 1, area, false);
             //X2+1 ensures that the end of one box will be on the same point
@@ -331,7 +331,7 @@ public class AreaGrid
         int pi = 0;
         for (Enumeration e = parent.getNode().children(); e.hasMoreElements(); pi += 2)
         {
-            Area area = ((AreaNode) e.nextElement()).getArea();
+            AreaImpl area = ((AreaNode) e.nextElement()).getArea();
             points[pi] = new GridPoint(area.getY1(), area, true);
             points[pi+1] = new GridPoint(area.getY2() + 1, area, false);
             //Y2+1 ensures that the end of one box will be on the same point
@@ -389,10 +389,10 @@ public class AreaGrid
 class GridPoint implements Comparable<GridPoint>
 {
     public int value;       //the point position
-    public Area area;       //the corresponding visual area
+    public AreaImpl area;       //the corresponding visual area
     public boolean begin;   //is it the begining or the end of the node?
     
-    public GridPoint(int value, Area area, boolean begin)
+    public GridPoint(int value, AreaImpl area, boolean begin)
     {
         this.value = value;
         this.area = area;
