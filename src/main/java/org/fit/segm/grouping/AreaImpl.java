@@ -92,12 +92,17 @@ public class AreaImpl implements Area
     /**
      * Counter for computing the average font size
      */
-    private int fontSizeCnt = 0;
+    private float fontSizeCnt = 0;
     
-    private int fontWeightSum = 0;
+    private float fontWeightSum = 0;
     private int fontWeightCnt = 0;
-    private int fontStyleSum = 0;
+    private float fontStyleSum = 0;
     private int fontStyleCnt = 0;
+    private float underlineSum = 0;
+    private int underlineCnt = 0;
+    private float lineThroughSum = 0;
+    private int lineThroughCnt = 0;
+    
     
     
 	//================================================================================
@@ -210,6 +215,10 @@ public class AreaImpl implements Area
         fontStyleCnt = src.fontStyleCnt;
         fontWeightSum = src.fontWeightSum;
         fontWeightCnt = src.fontWeightCnt;
+        underlineCnt = src.underlineCnt;
+        underlineSum = src.underlineSum;
+        lineThroughCnt = src.lineThroughCnt;
+        lineThroughSum = src.lineThroughSum;
         grid = null;
         gp = new Rectangular();
         tags = new HashSet<Tag>();
@@ -671,43 +680,65 @@ public class AreaImpl implements Area
      * Computes the average font size of the boxes in the area
      * @return the font size
      */
-    public float getAverageFontSize()
+    @Override
+    public float getFontSize()
     {
         if (fontSizeCnt == 0)
             return 0;
         else
-            return (float) fontSizeSum / fontSizeCnt;
+            return fontSizeSum / fontSizeCnt;
     }
     
     /**
      * Computes the average font weight of the boxes in the area
      * @return the font size
      */
-    public float getAverageFontWeight()
+    @Override
+    public float getFontWeight()
     {
         if (fontWeightCnt == 0)
             return 0;
         else
-            return (float) fontWeightSum / fontWeightCnt;
+            return fontWeightSum / fontWeightCnt;
     }
     
     /**
      * Computes the average font style of the boxes in the area
      * @return the font style
      */
-    public float getAverageFontStyle()
+    @Override
+    public float getFontStyle()
     {
         if (fontStyleCnt == 0)
             return 0;
         else
-            return (float) fontStyleSum / fontStyleCnt;
+            return fontStyleSum / fontStyleCnt;
     }
+    
+    @Override
+    public float getUnderline()
+    {
+        if (underlineCnt == 0)
+            return 0;
+        else
+            return underlineSum / underlineCnt;
+    }
+    
+    @Override
+    public float getLineThrough()
+    {
+        if (lineThroughCnt == 0)
+            return 0;
+        else
+            return lineThroughSum / lineThroughCnt;
+    }
+    
     
     /**
      * Computes the average luminosity of the boxes in the area
      * @return the font size
      */
-    public float getAverageColorLuminosity()
+    public float getColorLuminosity()
     {
         if (boxes.isEmpty())
             return 0;
@@ -737,6 +768,10 @@ public class AreaImpl implements Area
         fontWeightSum += other.fontWeightSum;
         fontStyleCnt += other.fontStyleCnt;
         fontStyleSum += other.fontStyleSum;
+        underlineCnt += other.underlineCnt;
+        underlineSum += other.underlineSum;
+        lineThroughCnt += other.lineThroughCnt;
+        lineThroughSum += other.lineThroughSum;
     }
     
     //====================================================================================
