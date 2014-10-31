@@ -15,6 +15,7 @@ import java.util.Vector;
 
 import org.fit.layout.model.Area;
 import org.fit.layout.model.Box;
+import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.ContentObject;
 import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
@@ -942,77 +943,6 @@ public class AreaImpl implements Area
         return ret;
     }
     
-    //=================================================================================
-    // Graphical output
-    // TODO generalize BrowserCanvas
-    //=================================================================================
-    
-    public void drawExtent(BrowserCanvas canvas)
-    {
-        Graphics ig = canvas.getImageGraphics();
-        Color c = ig.getColor();
-        ig.setColor(Color.MAGENTA);
-        ig.drawRect(bounds.getX1(), bounds.getY1(), bounds.getWidth() - 1, bounds.getHeight() - 1);
-        ig.setColor(c);
-    }
-    
-    public void colorizeByString(BrowserCanvas canvas, String s)
-    {
-        Graphics ig = canvas.getImageGraphics();
-        Color c = ig.getColor();
-        ig.setColor(stringColor(s));
-        ig.fillRect(bounds.getX1(), bounds.getY1(), bounds.getWidth() - 1, bounds.getHeight() - 1);
-        ig.setColor(c);
-    }
-    
-    public void colorizeByTags(BrowserCanvas canvas, Set<Tag> s)
-    {
-        if (!s.isEmpty())
-        {
-            Graphics ig = canvas.getImageGraphics();
-            Color c = ig.getColor();
-            float step = (float) bounds.getHeight() / s.size();
-            float y = bounds.getY1();
-            for (Iterator<Tag> it = s.iterator(); it.hasNext();)
-            {
-                Tag tag = it.next();
-                ig.setColor(stringColor(tag.getValue()));
-                ig.fillRect(bounds.getX1(), (int) y, bounds.getWidth(), (int) (step+0.5));
-                y += step;
-            }
-            ig.setColor(c);
-        }
-    }
-    
-    public void colorizeByClass(BrowserCanvas canvas, String cname)
-    {
-        if (cname != null && !cname.equals("") && !cname.equals("none"))
-        {
-            Graphics ig = canvas.getImageGraphics();
-            Color c = ig.getColor();
-            float step = (float) bounds.getHeight();
-            float y = bounds.getY1();
-            ig.setColor(stringColor(cname));
-            ig.fillRect(bounds.getX1(), (int) y, bounds.getWidth(), (int) (step+0.5));
-            ig.setColor(c);
-        }
-    }
-    
-    private Color stringColor(String cname)                                 
-    {                                                                            
-            if (cname == null || cname.equals(""))       
-                    return Color.WHITE;                                                 
-                                                                                 
-            String s = new String(cname);                                        
-            while (s.length() < 6) s = s + s;                                    
-            int r = (int) s.charAt(0) *  (int) s.charAt(1);                      
-            int g = (int) s.charAt(2) *  (int) s.charAt(3);                      
-            int b = (int) s.charAt(4) *  (int) s.charAt(5);                      
-            Color ret = new Color(100 + (r % 150), 100 + (g % 150), 100 + (b % 150), 128);              
-            //System.out.println(cname + " => " + ret.toString());               
-            return ret;                                                          
-    } 
-    
 	//=================================================================================
 
 	/**
@@ -1029,16 +959,16 @@ public class AreaImpl implements Area
         else if (sb.getWidth() > 0 && sb.getHeight() > 0)
         	contentBounds.expandToEnclose(sb);
         
-        if (box.getBox() instanceof TextBox)
+        if (box.getType() == Box.Type.TEXT_CONTENT)
         {
-            int len = box.getBox().getText().trim().length();
+            int len = box.getText().trim().length();
             if (len > 0)
             {
-               	fontSizeSum += getAverageBoxFontSize(box.getBox()) * len;
+               	fontSizeSum += getAverageBoxFontSize(box) * len;
                 fontSizeCnt += len;
-               	fontWeightSum += getAverageBoxFontWeight(box.getBox()) * len;
+               	fontWeightSum += getAverageBoxFontWeight(box) * len;
                 fontWeightCnt += len;
-               	fontStyleSum += getAverageBoxFontStyle(box.getBox()) * len;
+               	fontStyleSum += getAverageBoxFontStyle(box) * len;
                 fontStyleCnt += len;
             }
         }
@@ -1046,18 +976,17 @@ public class AreaImpl implements Area
 	
 	private double getAverageBoxFontSize(Box box)
 	{
-		if (box instanceof TextBox)
-			return box.getVisualContext().getFont().getSize();
-		else if (box.isReplaced())
+		if (box.getType() == Type.TEXT_CONTENT)
+			return box.getFontSize();
+		else if (box.getType() == Type.REPLACED_CONTENT)
 			return 0;
-		else if (box instanceof ElementBox)
+		else
 		{
-			ElementBox el = (ElementBox) box;
 			double sum = 0;
 			int cnt = 0;
-			for (int i = el.getStartChild(); i < el.getEndChild(); i++)
+			for (int i = 0; i < getChildCount(); i++)
 			{
-				Box child = el.getSubBox(i);
+				Box child = box.getChildBox(i);
 				String text = child.getText().trim();
 				cnt += text.length();
 				sum += getAverageBoxFontSize(child);
@@ -1067,62 +996,54 @@ public class AreaImpl implements Area
 			else
 				return 0;
 		}
-		else
-			return 0;
 	}
 	
 	private double getAverageBoxFontWeight(Box box)
 	{
-		if (box instanceof TextBox)
-			return box.getVisualContext().getFont().isBold() ? 1.0 : 0.0;
-		else if (box.isReplaced())
-			return 0;
-		else if (box instanceof ElementBox)
-		{
-			ElementBox el = (ElementBox) box;
-			double sum = 0;
-			int cnt = 0;
-			for (int i = el.getStartChild(); i < el.getEndChild(); i++)
-			{
-				Box child = el.getSubBox(i);
-				String text = child.getText().trim();
-				cnt += text.length();
-				sum += getAverageBoxFontWeight(child);
-			}
-			if (cnt > 0)
-				return sum / cnt;
-			else
-				return 0;
-		}
-		else
-			return 0;
+        if (box.getType() == Type.TEXT_CONTENT)
+            return box.getFontWeight();
+        else if (box.getType() == Type.REPLACED_CONTENT)
+            return 0;
+        else
+        {
+            double sum = 0;
+            int cnt = 0;
+            for (int i = 0; i < getChildCount(); i++)
+            {
+                Box child = box.getChildBox(i);
+                String text = child.getText().trim();
+                cnt += text.length();
+                sum += getAverageBoxFontWeight(child);
+            }
+            if (cnt > 0)
+                return sum / cnt;
+            else
+                return 0;
+        }
 	}
 	
 	private double getAverageBoxFontStyle(Box box)
 	{
-		if (box instanceof TextBox)
-			return box.getVisualContext().getFont().isItalic() ? 1.0 : 0;
-		else if (box.isReplaced())
-			return 0;
-		else if (box instanceof ElementBox)
-		{
-			ElementBox el = (ElementBox) box;
-			double sum = 0;
-			int cnt = 0;
-			for (int i = el.getStartChild(); i < el.getEndChild(); i++)
-			{
-				Box child = el.getSubBox(i);
-				String text = child.getText().trim();
-				cnt += text.length();
-				sum += getAverageBoxFontStyle(child);
-			}
-			if (cnt > 0)
-				return sum / cnt;
-			else
-				return 0;
-		}
-		else
-			return 0;
+        if (box.getType() == Type.TEXT_CONTENT)
+            return box.getFontStyle();
+        else if (box.getType() == Type.REPLACED_CONTENT)
+            return 0;
+        else
+        {
+            double sum = 0;
+            int cnt = 0;
+            for (int i = 0; i < getChildCount(); i++)
+            {
+                Box child = box.getChildBox(i);
+                String text = child.getText().trim();
+                cnt += text.length();
+                sum += getAverageBoxFontStyle(child);
+            }
+            if (cnt > 0)
+                return sum / cnt;
+            else
+                return 0;
+        }
 	}
 	
     private double colorLuminosity(Color c)
