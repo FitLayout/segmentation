@@ -659,7 +659,7 @@ public class AreaImpl implements Area
      * the first one is used. If there are no boxes (an artificial area), 0 is returned.
      * @return 
      */
-    public double getDeclaredFontSize()
+    public float getDeclaredFontSize()
     {
         if (boxes.size() > 0)
             return boxes.firstElement().getFontSize();
@@ -671,49 +671,49 @@ public class AreaImpl implements Area
      * Computes the average font size of the boxes in the area
      * @return the font size
      */
-    public double getAverageFontSize()
+    public float getAverageFontSize()
     {
         if (fontSizeCnt == 0)
             return 0;
         else
-            return (double) fontSizeSum / fontSizeCnt;
+            return (float) fontSizeSum / fontSizeCnt;
     }
     
     /**
      * Computes the average font weight of the boxes in the area
      * @return the font size
      */
-    public double getAverageFontWeight()
+    public float getAverageFontWeight()
     {
         if (fontWeightCnt == 0)
             return 0;
         else
-            return (double) fontWeightSum / fontWeightCnt;
+            return (float) fontWeightSum / fontWeightCnt;
     }
     
     /**
      * Computes the average font style of the boxes in the area
      * @return the font style
      */
-    public double getAverageFontStyle()
+    public float getAverageFontStyle()
     {
         if (fontStyleCnt == 0)
             return 0;
         else
-            return (double) fontStyleSum / fontStyleCnt;
+            return (float) fontStyleSum / fontStyleCnt;
     }
     
     /**
      * Computes the average luminosity of the boxes in the area
      * @return the font size
      */
-    public double getAverageColorLuminosity()
+    public float getAverageColorLuminosity()
     {
         if (boxes.isEmpty())
             return 0;
         else
         {
-            double sum = 0;
+            float sum = 0;
             int len = 0;
             for (Box box : boxes)
             {
@@ -974,7 +974,7 @@ public class AreaImpl implements Area
         }
 	}
 	
-	private double getAverageBoxFontSize(Box box)
+	private float getAverageBoxFontSize(Box box)
 	{
 		if (box.getType() == Type.TEXT_CONTENT)
 			return box.getFontSize();
@@ -982,7 +982,7 @@ public class AreaImpl implements Area
 			return 0;
 		else
 		{
-			double sum = 0;
+			float sum = 0;
 			int cnt = 0;
 			for (int i = 0; i < getChildCount(); i++)
 			{
@@ -998,7 +998,7 @@ public class AreaImpl implements Area
 		}
 	}
 	
-	private double getAverageBoxFontWeight(Box box)
+	private float getAverageBoxFontWeight(Box box)
 	{
         if (box.getType() == Type.TEXT_CONTENT)
             return box.getFontWeight();
@@ -1006,7 +1006,7 @@ public class AreaImpl implements Area
             return 0;
         else
         {
-            double sum = 0;
+            float sum = 0;
             int cnt = 0;
             for (int i = 0; i < getChildCount(); i++)
             {
@@ -1022,7 +1022,7 @@ public class AreaImpl implements Area
         }
 	}
 	
-	private double getAverageBoxFontStyle(Box box)
+	private float getAverageBoxFontStyle(Box box)
 	{
         if (box.getType() == Type.TEXT_CONTENT)
             return box.getFontStyle();
@@ -1030,7 +1030,7 @@ public class AreaImpl implements Area
             return 0;
         else
         {
-            double sum = 0;
+            float sum = 0;
             int cnt = 0;
             for (int i = 0; i < getChildCount(); i++)
             {
@@ -1046,20 +1046,20 @@ public class AreaImpl implements Area
         }
 	}
 	
-    private double colorLuminosity(Color c)
+    private float colorLuminosity(Color c)
     {
-        double lr, lg, lb;
+        float lr, lg, lb;
         if (c == null)
         {
             lr = lg = lb = 255;
         }
         else
         {
-            lr = Math.pow(c.getRed() / 255.0, 2.2);
-            lg = Math.pow(c.getGreen() / 255.0, 2.2);
-            lb = Math.pow(c.getBlue() / 255.0, 2.2);
+            lr = (float) Math.pow(c.getRed() / 255.0f, 2.2f);
+            lg = (float) Math.pow(c.getGreen() / 255.0f, 2.2f);
+            lb = (float) Math.pow(c.getBlue() / 255.0f, 2.2f);
         }
-        return lr * 0.2126 +  lg * 0.7152 + lb * 0.0722;
+        return lr * 0.2126f +  lg * 0.7152f + lb * 0.0722f;
     }
 
 }
