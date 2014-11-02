@@ -72,7 +72,7 @@ public class AreaImpl implements Area
     /**
      * Borders present?
      */
-    private boolean btop, bleft, bbottom, bright;
+    private int btop, bleft, bbottom, bright;
     
     /**
      * Background color of the first box in the area.
@@ -116,10 +116,10 @@ public class AreaImpl implements Area
 		boxes = new Vector<Box>();
 		bounds = new Rectangular(x1, y1, x2, y2);
         name = null;
-        btop = false;
-        bleft = false;
-        bright = false;
-        bbottom = false;
+        btop = 0;
+        bleft = 0;
+        bright = 0;
+        bbottom = 0;
         bgcolor = null;
         grid = null;
         gp = new Rectangular();
@@ -135,10 +135,10 @@ public class AreaImpl implements Area
         boxes = new Vector<Box>();
         bounds = new Rectangular(r);
         name = null;
-        btop = false;
-        bleft = false;
-        bright = false;
-        bbottom = false;
+        btop = 0;
+        bleft = 0;
+        bright = 0;
+        bbottom = 0;
         bgcolor = null;
         grid = null;
         gp = new Rectangular();
@@ -156,10 +156,10 @@ public class AreaImpl implements Area
         addBox(box); //expands the content bounds appropriately
         bounds = new Rectangular(contentBounds);
         this.name = box.toString();
-        btop = box.hasTopBorder();
-        bleft = box.hasLeftBorder();
-        bright = box.hasRightBorder();
-        bbottom = box.hasBottomBorder();
+        btop = box.getTopBorder();
+        bleft = box.getLeftBorder();
+        bright = box.getRightBorder();
+        bbottom = box.getBottomBorder();
         bgcolor = box.getBackgroundColor();
         backgroundSeparated = box.isBackgroundSeparated();
         grid = null;
@@ -180,10 +180,10 @@ public class AreaImpl implements Area
         Box box = boxlist.firstElement();
         bounds = new Rectangular(contentBounds);
         this.name = box.toString();
-        btop = box.hasTopBorder();
-        bleft = box.hasLeftBorder();
-        bright = box.hasRightBorder();
-        bbottom = box.hasBottomBorder();
+        btop = box.getTopBorder();
+        bleft = box.getLeftBorder();
+        bright = box.getRightBorder();
+        bbottom = box.getBottomBorder();
         bgcolor = box.getBackgroundColor();
         backgroundSeparated = box.isBackgroundSeparated();
         grid = null;
@@ -266,22 +266,26 @@ public class AreaImpl implements Area
         {
             if (getX1() <= other.getX1())
             {
-                if (other.hasRightBorder()) bright = true;
+                if (other.hasRightBorder())
+                    bright = other.getRightBorder();
             }
             else
             {
-                if (other.hasLeftBorder()) bleft = true;
+                if (other.hasLeftBorder())
+                    bleft = other.getLeftBorder();
             }
         }
         else
         {
             if (getY1() <= other.getY1())
             {
-                if (other.hasBottomBorder()) bbottom = true;
+                if (other.hasBottomBorder())
+                    bbottom = other.getBottomBorder();
             }
             else
             {
-                if (other.hasTopBorder()) btop = true;
+                if (other.hasTopBorder())
+                    btop = other.getTopBorder();
             }
         }
         //add all the contained boxes
@@ -377,7 +381,7 @@ public class AreaImpl implements Area
     /**
      * Set the borders around
      */
-    public void setBorders(boolean top, boolean left, boolean bottom, boolean right)
+    public void setBorders(int top, int left, int bottom, int right)
     {
     	btop = top;
     	bleft = left;
@@ -457,11 +461,23 @@ public class AreaImpl implements Area
     @Override
     public boolean hasTopBorder()
     {
+        return btop > 0;
+    }
+    
+    @Override
+    public int getTopBorder()
+    {
         return btop;
     }
     
     @Override
     public boolean hasLeftBorder()
+    {
+        return bleft > 0;
+    }
+    
+    @Override
+    public int getLeftBorder()
     {
         return bleft;
     }
@@ -469,11 +485,23 @@ public class AreaImpl implements Area
     @Override
     public boolean hasRightBorder()
     {
+        return bright > 0;
+    }
+    
+    @Override
+    public int getRightBorder()
+    {
         return bright;
     }
     
     @Override
     public boolean hasBottomBorder()
+    {
+        return bbottom > 0;
+    }
+    
+    @Override
+    public int getBottomBorder()
     {
         return bbottom;
     }
