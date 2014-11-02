@@ -7,7 +7,6 @@ package org.fit.segm.grouping;
 
 import java.awt.Color;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
@@ -17,6 +16,7 @@ import org.fit.layout.model.Area;
 import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.ContentObject;
+import org.fit.layout.model.Page;
 import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
 
@@ -30,6 +30,9 @@ public class AreaImpl implements Area
     private static int nextid = 1;
     
     private int id;
+    
+    /** The page this area belongs to */
+    protected Page page;
     
     /** The node that holds the area in the tree of areas */
     protected AreaNode node;
@@ -249,6 +252,54 @@ public class AreaImpl implements Area
     public void setNode(AreaNode node)
     {
         this.node = node;
+    }
+
+    /**
+     * Sets the page this area belongs to.
+     * @param page the page to be assigned to this area
+     */
+    public void setPage(Page page)
+    {
+        this.page = page;
+    }
+
+    /**
+     * Obtains the page this node belongs to.
+     * @return the page assigned to this area
+     */
+    @Override
+    public Page getPage()
+    {
+        return page;
+    }
+
+    @Override
+    public int getBorderCount()
+    {
+        int bcnt = 0;
+        if (hasTopBorder()) bcnt++;
+        if (hasBottomBorder()) bcnt++;
+        if (hasLeftBorder()) bcnt++;
+        if (hasRightBorder()) bcnt++;
+        return bcnt;
+    }
+
+    @Override
+    public Area getParentArea()
+    {
+        return getNode().getParentArea().getArea();
+    }
+
+    @Override
+    public Area getChildArea(int index) throws ArrayIndexOutOfBoundsException
+    {
+        return getNode().getChildArea(index).getArea();
+    }
+
+    @Override
+    public Rectangular getGridBounds()
+    {
+        return gp;
     }
 
     /**
@@ -1124,5 +1175,6 @@ public class AreaImpl implements Area
         }
         return lr * 0.2126f +  lg * 0.7152f + lb * 0.0722f;
     }
+
 
 }
