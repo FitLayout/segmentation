@@ -8,7 +8,11 @@ package org.fit.segm.grouping;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.fit.layout.model.Area;
+import org.fit.layout.model.Box;
+import org.fit.layout.model.Page;
 import org.fit.layout.model.SearchableAreaContainer;
+import org.fit.layout.model.Tag;
 
 
 /**
@@ -18,11 +22,8 @@ import org.fit.layout.model.SearchableAreaContainer;
  */
 public class AreaTree implements SearchableAreaContainer
 {
-    /** The tree root */
-    protected AreaNode root;
-    
     /** The source tree */
-    protected BoxTree boxtree;
+    protected Page boxtree;
     
     /** The root node area */
     protected AreaImpl rootarea;
@@ -33,41 +34,40 @@ public class AreaTree implements SearchableAreaContainer
      * Create a new tree of areas by the analysis of a box tree
      * @param srctree the source box tree
      */
-    public AreaTree(BoxTree srctree)
+    public AreaTree(Page srctree)
     {
         boxtree = srctree;
         rootarea = new AreaImpl(0, 0, 0, 0);
-        root = new AreaNode(rootarea);
     }
     
     /**
      * @return the root node of the tree of areas
      */
-    public AreaNode getRoot()
+    public Area getRoot()
     {
-        return root;
+        return rootarea;
     }
     
     /**
      * Creates the area tree skeleton - selects the visible boxes and converts
      * them to areas 
      */
-    public AreaNode findBasicAreas()
+    public Area findBasicAreas()
     {
         rootarea = new AreaImpl(0, 0, 0, 0);
-        root = new AreaNode(rootarea);
+        new AreaNode(rootarea);
         for (int i = 0; i < boxtree.getRoot().getChildCount(); i++)
         {
-            AreaNode sub;
-            sub = new AreaNode(new AreaImpl(boxtree.getRoot().getChildBox(i)));
+            Area sub;
+            sub = new AreaImpl(boxtree.getRoot().getChildBox(i));
             if (sub.getWidth() > 1 || sub.getHeight() > 1)
             {
                 findStandaloneAreas(boxtree.getRoot().getChildBox(i), sub);
-                root.addArea(sub);
+                rootarea.appendChild(sub);
             }
         }
-        createGrids(root);
-        return root;
+        createGrids(rootarea);
+        return rootarea;
     }
     
     //=================================================================================
@@ -79,22 +79,22 @@ public class AreaTree implements SearchableAreaContainer
      * @param boxroot the root of the box tree
      * @param arearoot the root node of the new area tree 
      */ 
-    private void findStandaloneAreas(BoxNode boxroot, AreaNode arearoot)
+    private void findStandaloneAreas(Box boxroot, Area arearoot)
     {
         if (boxroot.isVisible())
         {
             for (int i = 0; i < boxroot.getChildCount(); i++)
             {
-                BoxNode child = boxroot.getChildBox(i);
+                Box child = boxroot.getChildBox(i);
 		        if (child.isVisible())
 		        {
 	                if (child.isVisuallySeparated())
 	                {
-	                    AreaNode newnode = new AreaNode(new AreaImpl(child));
+	                    Area newnode = new AreaImpl(child);
 	                    if (newnode.getWidth() > 1 || newnode.getHeight() > 1)
 	                    {
                             findStandaloneAreas(child, newnode);
-	                    	arearoot.addArea(newnode);
+	                    	arearoot.appendChild(newnode);
 	                    }
 	                }
 	                else
@@ -108,11 +108,11 @@ public class AreaTree implements SearchableAreaContainer
      * Goes through all the areas in the tree and creates the grids in these areas
      * @param root the root node of the tree of areas
      */
-    protected void createGrids(AreaNode root)
+    protected void createGrids(AreaImpl root)
     {
-        root.getArea().createGrid();
+        root.createGrid();
         for (int i = 0; i < root.getChildCount(); i++)
-            createGrids(root.getChildArea(i));
+            createGrids((AreaImpl) root.getChildArea(i));
     }
 
     
@@ -120,18 +120,18 @@ public class AreaTree implements SearchableAreaContainer
     // node search
     //=================================================================================
     
-    public AreaNode getAreaAt(int x, int y)
+    public Area getAreaAt(int x, int y)
     {
-        return recursiveGetAreaAt(root, x, y);
+        return recursiveGetAreaAt(rootarea, x, y);
     }
     
-    private AreaNode recursiveGetAreaAt(AreaNode root, int x, int y)
+    private Area recursiveGetAreaAt(Area root, int x, int y)
     {
-        if (root.getArea().contains(x, y))
+        if (root.getBounds().contains(x, y))
         {
             for (int i = 0; i < root.getChildCount(); i++)
             {
-                AreaNode ret = recursiveGetAreaAt(root.getChildArea(i), x, y);
+                Area ret = recursiveGetAreaAt(root.getChildArea(i), x, y);
                 if (ret != null)
                     return ret;
             }
@@ -141,20 +141,20 @@ public class AreaTree implements SearchableAreaContainer
             return null;
     }
     
-    public AreaNode getAreaByName(String name)
+    public Area getAreaByName(String name)
     {
-        return recursiveGetAreaByName(root, name);
+        return recursiveGetAreaByName(rootarea, name);
     }
     
-    private AreaNode recursiveGetAreaByName(AreaNode root, String name)
+    private Area recursiveGetAreaByName(Area root, String name)
     {
-        if (root.toString().indexOf(name) != -1)
+        if (root.toString().indexOf(name) != -1) //TODO ???
             return root;
         else
         {
             for (int i = 0; i < root.getChildCount(); i++)
             {
-                AreaNode ret = recursiveGetAreaByName(root.getChildArea(i), name);
+                Area ret = recursiveGetAreaByName(root.getChildArea(i), name);
                 if (ret != null)
                     return ret;
             }
@@ -177,9 +177,9 @@ public class AreaTree implements SearchableAreaContainer
         return ret;
     }
     
-    private void recursiveGetTags(AreaNode root, Set<Tag> dest)
+    private void recursiveGetTags(Area root, Set<Tag> dest)
     {
-        dest.addAll(root.getArea().getTags());
+        dest.addAll(root.getTags());
         for (int i = 0; i < root.getChildCount(); i++)
             recursiveGetTags(root.getChildArea(i), dest);
     }

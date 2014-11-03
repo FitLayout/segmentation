@@ -25,7 +25,6 @@ public class AreaNode extends DefaultMutableTreeNode
     public AreaNode(AreaImpl area)
     {
         super(area);
-        area.setNode(this);
     }
 
     //====================================================================================

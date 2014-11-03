@@ -127,6 +127,7 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashSet<Tag>();
+        setNode(new AreaNode(this));
 	}
     
     /** 
@@ -146,6 +147,7 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashSet<Tag>();
+        setNode(new AreaNode(this));
     }
     
     /** 
@@ -168,6 +170,7 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashSet<Tag>();
+        setNode(new AreaNode(this));
     }
     
     /** 
@@ -192,6 +195,7 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashSet<Tag>();
+        setNode(new AreaNode(this));
     }
     
     /** 
@@ -225,6 +229,7 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashSet<Tag>();
+        setNode(new AreaNode(this));
     }
     
     /**
@@ -296,6 +301,12 @@ public class AreaImpl implements Area
         return getNode().getChildArea(index).getArea();
     }
 
+    @Override
+    public void appendChild(Area child)
+    {
+        getNode().addArea(((AreaImpl) child).getNode());
+    }
+    
     @Override
     public Rectangular getGridBounds()
     {
