@@ -40,6 +40,9 @@ public class AreaImpl implements Area
     /** A grid of inserted elements */
     protected AreaGrid grid;
     
+    /** Set of separators */
+    private SeparatorSet seps;
+    
     /** Position of this area in the parent grid */
     protected Rectangular gp;
     
@@ -86,6 +89,9 @@ public class AreaImpl implements Area
      * Is the first box in the area separated by background?
      */
     private boolean backgroundSeparated;
+    
+    /** Explicitly separated area */
+    private boolean separated;
     
     /**
      * Sum for computing the average font size
@@ -864,6 +870,18 @@ public class AreaImpl implements Area
         lineThroughSum += other.lineThroughSum;
     }
     
+    @Override
+    public String getText()
+    {
+        String ret = "";
+        if (getNode().isLeaf())
+            ret = getBoxText();
+        else
+            for (int i = 0; i < getChildCount(); i++)
+                ret += getChildArea(i).getText();
+        return ret;
+    }
+    
     //====================================================================================
     // grid operations
     //====================================================================================
@@ -994,6 +1012,76 @@ public class AreaImpl implements Area
         return true;
     }
 
+    /**
+     * Creates a set of the horizontal and vertical separators
+     */
+    public void createSeparators()
+    {
+        seps = Config.createSeparators(this);
+    }
+    
+    /**
+     * @return the set of separators in this area
+     */
+    public SeparatorSet getSeparators()
+    {
+        return seps;
+    }
+    
+    /**
+     * Looks for the nearest text box area placed above the separator. If there are more
+     * such areas in the same distance, the leftmost one is returned.
+     * @param sep the separator 
+     * @return the leaf area containing the box or <code>null</code> if there is nothing above the separator
+     */
+    public AreaImpl findContentAbove(Separator sep)
+    {
+        return recursiveFindAreaAbove(sep.getX1(), sep.getX2(), 0, sep.getY1());
+    }
+    
+    private AreaImpl recursiveFindAreaAbove(int x1, int x2, int y1, int y2)
+    {
+        AreaImpl ret = null;
+        int maxx = x2;
+        int miny = y1;
+        Vector <Box> boxes = getBoxes();
+        for (Box box : boxes)
+        {
+            int bx = box.getBounds().getX1();
+            int by = box.getBounds().getY2();
+            if ((bx >= x1 && bx <= x2 && by < y2) &&  //is placed above
+                    (by > miny ||
+                     (by == miny && bx < maxx)))
+            {
+                ret = this; //found in our boxes
+                if (bx < maxx) maxx = bx;
+                if (by > miny) miny = by;
+            }
+        }
+
+        for (int i = 0; i < getChildCount(); i++)
+        {
+            AreaImpl child = (AreaImpl) getChildArea(i);
+            AreaImpl area = child.recursiveFindAreaAbove(x1, x2, miny, y2);
+            if (area != null)
+            {   
+                int bx = area.getX1(); 
+                int by = area.getY2();
+                int len = area.getText().length();
+                if ((len > 0) && //we require some text in the area
+                        (by > miny ||
+                         (by == miny && bx < maxx)))
+                {
+                    ret = area;
+                    if (bx < maxx) maxx = bx;
+                    if (by > miny) miny = by;
+                }
+            }
+        }
+        
+        return ret;
+    }
+    
     //====================================================================================
     // tagging
     //====================================================================================
@@ -1187,5 +1275,82 @@ public class AreaImpl implements Area
         return lr * 0.2126f +  lg * 0.7152f + lb * 0.0722f;
     }
 
+    //==========================================================================
+    // TESTS
+    //==========================================================================
+    
+    /**
+     * @return <code>true<code> if the area is separated from the areas below it
+     */
+    public boolean separatedDown()
+    {
+        return hasBottomBorder() || isBackgroundSeparated();
+    }
+    
+    /**
+     * @return <code>true<code> if the area is separated from the areas above it
+     */
+    public boolean separatedUp()
+    {
+        return hasTopBorder() || isBackgroundSeparated();
+    }
+    
+    /**
+     * @return <code>true<code> if the area is separated from the areas on the left
+     */
+    public boolean separatedLeft()
+    {
+        return hasLeftBorder() || isBackgroundSeparated();
+    }
+    
+    /**
+     * @return <code>true<code> if the area is separated from the areas on the right
+     */
+    public boolean separatedRight()
+    {
+        return hasRightBorder() || isBackgroundSeparated();
+    }
 
+    /**
+     * When set to true, the area is considered to be separated from other
+     * areas explicitly, i.e. independently on its real borders or background.
+     * This is usually used for some new superareas.
+     * @return <code>true</code>, if the area is explicitly separated
+     */
+    public boolean isExplicitlySeparated()
+    {
+        return separated;
+    }
+
+    /**
+     * When set to true, the area is considered to be separated from other
+     * areas explicitly, i.e. independently on its real borders or background.
+     * This is usually used for some new superareas.
+     * @param separated <code>true</code>, if the area should be explicitly separated
+     */
+    public void setSeparated(boolean separated)
+    {
+        this.separated = separated;
+    }
+
+    /**
+     * Obtains the overall style of the area.
+     * @return the area style
+     */
+    public AreaStyle getStyle()
+    {
+        return new AreaStyle(this);
+    }
+    
+    /**
+     * Compares two areas and decides whether they have the same style. The thresholds of the style are taken from the {@link Config}.
+     * @param other the other area to be compared
+     * @return <code>true</code> if the areas are considered to have the same style
+     */
+    public boolean hasSameStyle(AreaImpl other)
+    {
+        return getStyle().isSameStyle(other.getStyle());
+    }
+    
+    
 }

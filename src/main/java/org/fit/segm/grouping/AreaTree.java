@@ -10,6 +10,8 @@ import java.util.Set;
 
 import org.fit.layout.model.Area;
 import org.fit.layout.model.Box;
+import org.fit.layout.model.Box.DisplayType;
+import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.Page;
 import org.fit.layout.model.SearchableAreaContainer;
 import org.fit.layout.model.Tag;
@@ -88,7 +90,7 @@ public class AreaTree implements SearchableAreaContainer
                 Box child = boxroot.getChildBox(i);
 		        if (child.isVisible())
 		        {
-	                if (child.isVisuallySeparated())
+	                if (isVisuallySeparated(child))
 	                {
 	                    Area newnode = new AreaImpl(child);
 	                    if (newnode.getWidth() > 1 || newnode.getHeight() > 1)
@@ -115,6 +117,46 @@ public class AreaTree implements SearchableAreaContainer
             createGrids((AreaImpl) root.getChildArea(i));
     }
 
+    public static boolean isVisuallySeparated(Box box)
+    {
+        //invisible boxes are not separated
+        if (!box.isVisible()) 
+            return false;
+        //root box is visually separated
+        else if (box.getParentBox() == null)
+            return true;
+        //non-empty text boxes are visually separated
+        else if (box.getType() == Type.TEXT_CONTENT) 
+        {
+            if (box.getText().trim().isEmpty())
+                return false;
+            else
+                return true;
+        }
+        //replaced boxes are visually separated
+        else if (box.getType() == Type.REPLACED_CONTENT)
+        {
+            return true;
+        }
+        //list item boxes with a bullet
+        else if (box.getDisplayType() == DisplayType.LIST_ITEM)
+        {
+            return true;
+        }
+        //other element boxes
+        else 
+        {
+            //check if separated by border -- at least one border needed
+            if (box.getBorderCount() >= 1)
+                return true;
+            //check the background
+            else if (box.isBackgroundSeparated())
+                return true;
+            return false;
+        }
+
+    }
+    
     
     //=================================================================================
     // node search

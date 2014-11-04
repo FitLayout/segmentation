@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.fit.layout.impl.Area;
+import org.fit.layout.model.Area;
 
 /**
  * A generic set of horizontal and vertical separators for a page.
@@ -28,7 +28,7 @@ public abstract class SeparatorSet
     protected static final int ART_SEP_WIDTH = 1;
     
 	/** The root of the area tree that will be processed */
-	protected GroupingAreaNode root;
+	protected AreaImpl root;
 	
 	/** List of horizontal separators */
 	protected Vector<Separator> hsep;
@@ -42,7 +42,7 @@ public abstract class SeparatorSet
 	/**
 	 * Creates a new separator set with one horizontal and one vertical separator.
 	 */
-	public SeparatorSet(GroupingAreaNode root)
+	public SeparatorSet(AreaImpl root)
 	{
         this.root = root;
         init(null);
@@ -51,7 +51,7 @@ public abstract class SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSet(GroupingAreaNode root, Area filter)
+    public SeparatorSet(AreaImpl root, Area filter)
     {
         this.root = root;
         init(filter);
@@ -106,7 +106,7 @@ public abstract class SeparatorSet
      */
     public int getMinHSepHeight()
     {
-        return (int) (root.getArea().getAverageFontSize() * HSEP_MIN_HEIGHT);
+        return (int) (root.getFontSize() * HSEP_MIN_HEIGHT);
     }
     
     /**
@@ -116,7 +116,7 @@ public abstract class SeparatorSet
      */
     public int getMinVSepWidth()
     {
-        return (int) (root.getArea().getAverageFontSize() * VSEP_MIN_WIDTH);
+        return (int) (root.getFontSize() * VSEP_MIN_WIDTH);
     }
     
     //=====================================================================================
@@ -154,7 +154,7 @@ public abstract class SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area
      * 	are considered
      */
-    protected abstract void findSeparators(GroupingAreaNode area, Area filter);
+    protected abstract void findSeparators(AreaImpl area, Area filter);
     
     /**
      * Applies various filters on the current separator sets in order to remove irrelevant separators or adjust the sizes.
@@ -190,13 +190,13 @@ public abstract class SeparatorSet
         for (Iterator<Separator> it = hsep.iterator(); it.hasNext();)
         {
             Separator sep = it.next();
-            if (sep.getY1() == root.getArea().getY1() || sep.getY2() == root.getArea().getY2())
+            if (sep.getY1() == root.getY1() || sep.getY2() == root.getY2())
                 it.remove();
         }
         for (Iterator<Separator> it = vsep.iterator(); it.hasNext();)
         {
             Separator sep = it.next();
-            if (sep.getX1() == root.getArea().getX1() || sep.getX2() == root.getArea().getX2())
+            if (sep.getX1() == root.getX1() || sep.getX2() == root.getX2())
                 it.remove();
         }
     }
@@ -215,11 +215,11 @@ public abstract class SeparatorSet
         {
             Separator sep = it.next();
             //Adaptive height threshold: use the font size of the box above the separator for determining the em size for the threshold  
-            GroupingAreaNode above = root.findContentAbove(sep);
+            AreaImpl above = root.findContentAbove(sep);
             if (above != null)
-                hthreshold = (int) (above.getArea().getAverageFontSize() * HSEP_MIN_HEIGHT);
+                hthreshold = (int) (above.getFontSize() * HSEP_MIN_HEIGHT);
             else
-                hthreshold = (int) (root.getArea().getAverageFontSize() * HSEP_MIN_HEIGHT);
+                hthreshold = (int) (root.getFontSize() * HSEP_MIN_HEIGHT);
             //System.out.println("For: " + sep + " limit " + hthreshold + " area " + above);
             
             if (sep.getWeight() < hthreshold)
@@ -314,32 +314,32 @@ public abstract class SeparatorSet
     /**
      * Creates a list of separators that are implemented as visual area borders.
      */
-    private void findAreaSeparators(GroupingAreaNode root)
+    private void findAreaSeparators(AreaImpl root)
     {
         bsep = new Vector<Separator>();
         for (int i = 0; i < root.getChildCount(); i++)
-            analyzeAreaSeparators((GroupingAreaNode) root.getChildArea(i));
+            analyzeAreaSeparators((AreaImpl) root.getChildArea(i));
     }
     
     /**
      * Analyzes the area and detects the separators that are implemented as borders
      * or background changes.
      */
-    private void analyzeAreaSeparators(GroupingAreaNode area)
+    private void analyzeAreaSeparators(AreaImpl area)
     {
-        boolean isep = area.explicitelySeparated() || area.isBackgroundSeparated();
+        boolean isep = area.isExplicitlySeparated() || area.isBackgroundSeparated();
         if (isep || area.separatedUp())
             bsep.add(new Separator(Separator.BOXH,
-                                   area.getX(), area.getY(), area.getX2(), area.getY() + ART_SEP_WIDTH - 1));
+                                   area.getX1(), area.getY1(), area.getX2(), area.getY1() + ART_SEP_WIDTH - 1));
         if (isep || area.separatedDown())
             bsep.add(new Separator(Separator.BOXH,
-                                   area.getX(), area.getY2() - ART_SEP_WIDTH + 1, area.getX2(), area.getY2()));
+                                   area.getX1(), area.getY2() - ART_SEP_WIDTH + 1, area.getX2(), area.getY2()));
         if (isep || area.separatedLeft())
             bsep.add(new Separator(Separator.BOXV,
-                                   area.getX(), area.getY(), area.getX() + ART_SEP_WIDTH - 1, area.getY2()));
+                                   area.getX1(), area.getY1(), area.getX1() + ART_SEP_WIDTH - 1, area.getY2()));
         if (isep || area.separatedRight())
             bsep.add(new Separator(Separator.BOXV,
-                                   area.getX2() - ART_SEP_WIDTH + 1, area.getY(), area.getX2(), area.getY2()));
+                                   area.getX2() - ART_SEP_WIDTH + 1, area.getY1(), area.getX2(), area.getY2()));
     }
     
     //================================================================

@@ -8,7 +8,6 @@ package org.fit.segm.grouping;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.fit.layout.impl.Area;
 import org.fit.layout.model.Rectangular;
 
 /**
@@ -48,7 +47,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
      * @param maxlevel maximal level of the areas that can be joined into a super area
      * @param matchstyles defines whether to compare the element styles while expanding
      */
-    public GroupAnalyzerByStyles(GroupingAreaNode parent, int maxlevel, boolean matchstyles)
+    public GroupAnalyzerByStyles(AreaImpl parent, int maxlevel, boolean matchstyles)
     {
         super(parent);
         this.maxlevel = maxlevel;
@@ -56,7 +55,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     }
 
     @Override
-    public GroupingAreaNode findSuperArea(GroupingAreaNode sub, Vector<GroupingAreaNode> selected)
+    public AreaImpl findSuperArea(AreaImpl sub, Vector<AreaImpl> selected)
     {
         //parent.createSeparators();
         seps = parent.getSeparators();
@@ -76,7 +75,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         Rectangular mingp = null;
         for (int i = 0; i < parent.getChildCount(); i++)
         {
-            GroupingAreaNode chld = parent.getChildArea(i);
+            AreaImpl chld = (AreaImpl) parent.getChildArea(i);
             if (gp.encloses(chld.getGridPosition()))
             {
                 selected.add(chld);
@@ -88,15 +87,15 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         }
         
         //create the new area
-        Area area = new Area(parent.getArea().getX1() + grid.getColOfs(mingp.getX1()),
-                             parent.getArea().getY1() + grid.getRowOfs(mingp.getY1()),
-                             parent.getArea().getX1() + grid.getColOfs(mingp.getX2()+1) - 1,
-                             parent.getArea().getY1() + grid.getRowOfs(mingp.getY2()+1) - 1);
+        AreaImpl area = new AreaImpl(parent.getX1() + grid.getColOfs(mingp.getX1()),
+                             parent.getY1() + grid.getRowOfs(mingp.getY1()),
+                             parent.getX1() + grid.getColOfs(mingp.getX2()+1) - 1,
+                             parent.getY1() + grid.getRowOfs(mingp.getY2()+1) - 1);
         //area.setBorders(true, true, true, true);
         area.setLevel(1);
         //if (!mingp.equals(sub.getGridPosition()))
         //    System.out.println("Found area: " + area + " : " + mingp);
-        GroupingAreaNode ret = new GroupingAreaNode(area);
+        AreaImpl ret = new AreaImpl(area);
         ret.setGridPosition(mingp);
         return ret;
     }
@@ -113,7 +112,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
      * @param required indicates whether it is required to reach the specified limit horizontaly
      * 	vertically or in both directions (use REQ_* constants) 
      */
-    private void expandToLimit(GroupingAreaNode sub, Rectangular gp, Rectangular limit, GroupingAreaNode template, 
+    private void expandToLimit(AreaImpl sub, Rectangular gp, Rectangular limit, AreaImpl template, 
     							boolean hsep, boolean vsep,
     							short prefDir, short required)
     {
@@ -243,17 +242,17 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
      * @param sep stop on separators
      * @return the new vertical end of the area.
      */ 
-    private int expandVertically(Rectangular gp, Rectangular limit, GroupingAreaNode template, boolean down, boolean sep)
+    private int expandVertically(Rectangular gp, Rectangular limit, AreaImpl template, boolean down, boolean sep)
     {
         //System.out.println("exp: " + gp + (down?" _":" ^") + " " + sep);
         int na = down ? gp.getY2() : gp.getY1(); //what to return when it's not possible to expand
         int targety = down ? (gp.getY2() + 1) : (gp.getY1() - 1); 
         //find candidate boxes
-        Vector<GroupingAreaNode> cands = new Vector<GroupingAreaNode>();
+        Vector<AreaImpl> cands = new Vector<AreaImpl>();
         int x = gp.getX1();
         while (x <= gp.getX2()) //scan everything at the target position
         {
-            GroupingAreaNode cand = grid.getNodeAt(x, targety);
+            AreaImpl cand = grid.getAreaAt(x, targety);
             //ignore candidates that intersect with our area (could leat to an infinite loop)
             if (cand == null || cand.getGridPosition().intersects(gp))
                 x++;
@@ -267,14 +266,14 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         if (cands.size() == 0)
             return targety;
         //try to align the candidate boxes
-        for (Iterator<GroupingAreaNode> it = cands.iterator(); it.hasNext(); )
+        for (Iterator<AreaImpl> it = cands.iterator(); it.hasNext(); )
         {
-            GroupingAreaNode cand = it.next();
-            if (sep && cand.getArea() != null &&
+            AreaImpl cand = it.next();
+            if (sep && 
                     ((down && separatorUp(cand.getGridPosition())) ||
                      (!down && separatorDown(cand.getGridPosition()))))
                 return na; //separated, cannot expand
-            else if ((matchstyles && !cand.hasSameStyle(template)) || cand.getArea().getLevel() > maxlevel)
+            else if ((matchstyles && !cand.hasSameStyle(template)) || cand.getLevel() > maxlevel)
                 return na; //not the same style or level
             else
             {
@@ -313,7 +312,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
      * @param sep stop on separators
      * @return the new vertical end of the area.
      */ 
-    private int expandHorizontally(Rectangular gp, Rectangular limit, GroupingAreaNode template, boolean right, boolean sep)
+    private int expandHorizontally(Rectangular gp, Rectangular limit, AreaImpl template, boolean right, boolean sep)
     {
         //System.out.println("exp: " + gp + (right?" ->":" <-") + " " + sep);
         int na = right ? gp.getX2() : gp.getX1(); //what to return when it's not possible to expand
@@ -323,16 +322,16 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         int y = gp.getY1();
         while (y <= gp.getY2()) //scan everything at the target position
         {
-            GroupingAreaNode cand = grid.getNodeAt(targetx, y);
+            AreaImpl cand = grid.getAreaAt(targetx, y);
             //ignore candidates that intersect with our area (could leat to an infinite loop)
             if (cand != null && !cand.getGridPosition().intersects(gp))
             {
                 found = true;
-                if (sep && cand.getArea() != null &&
+                if (sep &&
                         ((right && separatorLeft(cand.getGridPosition())) ||
                          (!right && separatorRight(cand.getGridPosition()))))
                     return na; //separated, cannot expand
-                else if ((matchstyles && !cand.hasSameStyle(cand)) || cand.getArea().getLevel() > maxlevel)
+                else if ((matchstyles && !cand.hasSameStyle(cand)) || cand.getLevel() > maxlevel)
                     return na; //not the same style or level
                 else
                 {

@@ -23,10 +23,10 @@ public class Separator extends Rectangular implements Comparable<Separator>
     protected short type;
     
     /** Left (top) separated area node (if any) */
-    protected GroupingAreaNode area1;
+    protected AreaImpl area1;
     
     /** Bottom (right) separated area node (if any) */
-    protected GroupingAreaNode area2;
+    protected AreaImpl area2;
     
     //======================================================================================
     
@@ -69,22 +69,22 @@ public class Separator extends Rectangular implements Comparable<Separator>
         return type == BOXH || type == BOXV;
     }
 
-    public GroupingAreaNode getArea1()
+    public AreaImpl getArea1()
     {
         return area1;
     }
 
-    public void setArea1(GroupingAreaNode area1)
+    public void setArea1(AreaImpl area1)
     {
         this.area1 = area1;
     }
 
-    public GroupingAreaNode getArea2()
+    public AreaImpl getArea2()
     {
         return area2;
     }
 
-    public void setArea2(GroupingAreaNode area2)
+    public void setArea2(AreaImpl area2)
     {
         this.area2 = area2;
     }

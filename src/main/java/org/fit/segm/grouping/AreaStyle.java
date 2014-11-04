@@ -8,19 +8,20 @@ package org.fit.segm.grouping;
 import java.awt.Color;
 
 /**
- * A 
+ * This class represents the complete style of an area for further comparison.
+ * 
  * @author burgetr
  */
 public class AreaStyle
 {
-    private double averageFontSize;
-    private double averageFontWeight;
-    private double averageFontStyle;
-    private double averageColorLuminosity;
+    private float averageFontSize;
+    private float averageFontWeight;
+    private float averageFontStyle;
+    private float averageColorLuminosity;
     private Color backgroundColor;
     
-    public AreaStyle(double averageFontSize, double averageFontWeight,
-            double averageFontStyle, double averageColorLuminosity,
+    public AreaStyle(float averageFontSize, float averageFontWeight,
+            float averageFontStyle, float averageColorLuminosity,
             Color backgroundColor)
     {
         this.averageFontSize = averageFontSize;
@@ -30,13 +31,13 @@ public class AreaStyle
         this.backgroundColor = backgroundColor;
     }
     
-    public AreaStyle(GroupingAreaNode source)
+    public AreaStyle(AreaImpl source)
     {
-        this.averageFontSize = source.getArea().getAverageFontSize();
-        this.averageFontWeight = source.getArea().getAverageFontWeight();
-        this.averageFontStyle = source.getArea().getAverageFontStyle();
-        this.averageColorLuminosity = source.getArea().getAverageColorLuminosity();
-        this.backgroundColor = source.getArea().getBackgroundColor();
+        this.averageFontSize = source.getFontSize();
+        this.averageFontWeight = source.getFontWeight();
+        this.averageFontStyle = source.getFontStyle();
+        this.averageColorLuminosity = source.getColorLuminosity();
+        this.backgroundColor = source.getBackgroundColor();
     }
 
     public double getAverageFontSize()
@@ -44,7 +45,7 @@ public class AreaStyle
         return averageFontSize;
     }
 
-    public void setAverageFontSize(double averageFontSize)
+    public void setAverageFontSize(float averageFontSize)
     {
         this.averageFontSize = averageFontSize;
     }
@@ -54,7 +55,7 @@ public class AreaStyle
         return averageFontWeight;
     }
 
-    public void setAverageFontWeight(double averageFontWeight)
+    public void setAverageFontWeight(float averageFontWeight)
     {
         this.averageFontWeight = averageFontWeight;
     }
@@ -64,7 +65,7 @@ public class AreaStyle
         return averageFontStyle;
     }
 
-    public void setAverageFontStyle(double averageFontStyle)
+    public void setAverageFontStyle(float averageFontStyle)
     {
         this.averageFontStyle = averageFontStyle;
     }
@@ -74,7 +75,7 @@ public class AreaStyle
         return averageColorLuminosity;
     }
 
-    public void setAverageColorLuminosity(double averageColorLuminosity)
+    public void setAverageColorLuminosity(float averageColorLuminosity)
     {
         this.averageColorLuminosity = averageColorLuminosity;
     }

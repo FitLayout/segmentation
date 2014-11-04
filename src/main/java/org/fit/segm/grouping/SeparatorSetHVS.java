@@ -8,7 +8,7 @@ package org.fit.segm.grouping;
 import java.util.Iterator;
 import java.util.Vector;
 
-import org.fit.layout.impl.Area;
+import org.fit.layout.model.Area;
 
 /**
  * A horizntal/vertical separator detection with shrinking. The separator set is created by splitting the horizontal and vertical separators independently.
@@ -20,7 +20,7 @@ public class SeparatorSetHVS extends SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSetHVS(GroupingAreaNode root)
+    public SeparatorSetHVS(AreaImpl root)
     {
         super(root);
     }
@@ -28,7 +28,7 @@ public class SeparatorSetHVS extends SeparatorSet
     /**
      * Creates a new separator set with one horizontal and one vertical separator.
      */
-    public SeparatorSetHVS(GroupingAreaNode root, Area filter)
+    public SeparatorSetHVS(AreaImpl root, Area filter)
     {
         super(root, filter);
     }
@@ -41,12 +41,12 @@ public class SeparatorSetHVS extends SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area
      *  are considered
      */
-    protected void findSeparators(GroupingAreaNode area, Area filter)
+    protected void findSeparators(AreaImpl area, Area filter)
     {
         hsep = new Vector<Separator>();
         vsep = new Vector<Separator>();
         
-        Area base = (filter == null) ? area.getArea() : filter;
+        Area base = (filter == null) ? area : filter;
         Separator hinit = new Separator(Separator.HORIZONTAL,
                                         base.getX1(),
                                         base.getY1(),
@@ -91,11 +91,11 @@ public class SeparatorSetHVS extends SeparatorSet
      * Consider a new area -- updates the separators according to this new area
      * @param area The new area node to be considered
      */
-    private void considerArea(GroupingAreaNode area)
+    private void considerArea(AreaImpl area)
     {
         //area coordinates
-        int ax1 = area.getX();
-        int ay1 = area.getY();
+        int ax1 = area.getX1();
+        int ay1 = area.getY1();
         int ax2 = area.getX2();
         int ay2 = area.getY2();
         
@@ -175,18 +175,18 @@ public class SeparatorSetHVS extends SeparatorSet
      * @param filter if not null, only the sub areas enclosed in the filter area are considered
      * @return the number of processed subareas
      */
-    private int considerSubareas(GroupingAreaNode area, Area filter)
+    private int considerSubareas(AreaImpl area, Area filter)
     {
         int ret = 0;
         for (int i = 0; i < area.getChildCount(); i++)
         {
-            GroupingAreaNode sub = area.getChildArea(i);
-            if (filter == null || filter.encloses(sub.getArea()))
+            AreaImpl sub = (AreaImpl) area.getChildArea(i);
+            if (filter == null || filter.getBounds().encloses(sub.getBounds()))
             {
-                if (sub.getArea().isHorizontalSeparator())
+                if (sub.isHorizontalSeparator())
                 {
                 }
-                else if (sub.getArea().isVerticalSeparator())
+                else if (sub.isVerticalSeparator())
                 {
                 }
                 else
@@ -233,7 +233,7 @@ public class SeparatorSetHVS extends SeparatorSet
                 //separator entirely inside -- split the area 
                 else if (sy1 > ay1 && sy2 < ay2)
                 {
-                    Area newarea = new Area(area.getX1(), sy2 + 1,
+                    Area newarea = new AreaImpl(area.getX1(), sy2 + 1,
                                                         area.getX2(), area.getY2());
                     newareas.add(newarea);
                     area.getBounds().setY2(sy1 - 1);
@@ -267,7 +267,7 @@ public class SeparatorSetHVS extends SeparatorSet
                 //separator entirely inside -- split the area 
                 else if (sx1 > ax1 && sx2 < ax2)
                 {
-                    Area newarea = new Area(sx2 + 1, area.getY1(),
+                    Area newarea = new AreaImpl(sx2 + 1, area.getY1(),
                                                         area.getX2(), area.getY2());
                     newareas.add(newarea);
                     area.getBounds().setX2(sx1 - 1);
@@ -314,7 +314,7 @@ public class SeparatorSetHVS extends SeparatorSet
                     //separator entirely inside -- split the area 
                     else if (sy1 > ay1 && sy2 < ay2)
                     {
-                        Area newarea = new Area(area.getX1(), sy1,
+                        Area newarea = new AreaImpl(area.getX1(), sy1,
                                                             area.getX2(), area.getY2());
                         newareas.add(newarea);
                         area.getBounds().setY2(sy1 - 1);
@@ -352,7 +352,7 @@ public class SeparatorSetHVS extends SeparatorSet
                     //separator entirely inside -- split the area 
                     else if (sx1 > ax1 && sx2 < ax2)
                     {
-                        Area newarea = new Area(sx1, area.getY1(),
+                        Area newarea = new AreaImpl(sx1, area.getY1(),
                                                             area.getX2(), area.getY2());
                         newareas.add(newarea);
                         area.getBounds().setX2(sx1 - 1);
@@ -381,10 +381,10 @@ public class SeparatorSetHVS extends SeparatorSet
      */
     private Vector<Area> createAreas(Area filter)
     {
-        Area base = (filter == null) ? root.getArea() : filter;
+        Area base = (filter == null) ? root : filter;
         
         Vector<Area> areas = new Vector<Area>();
-        Area init = new Area(base.getX1(), base.getY1(), base.getX2(), base.getY2());
+        Area init = new AreaImpl(base.getX1(), base.getY1(), base.getX2(), base.getY2());
         areas.add(init);
         for (Separator sep : hsep)
             considerSeparator(areas, sep, true);
