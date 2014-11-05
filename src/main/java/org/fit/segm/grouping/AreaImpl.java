@@ -446,6 +446,24 @@ public class AreaImpl implements Area
     	return boxes;
     }
     
+    /** 
+     * Obtains all the boxes from this area and all the child areas.
+     * @return The list of boxes
+     */
+    @Override
+    public Vector<Box> getAllBoxes()
+    {
+        Vector<Box> ret = new Vector<Box>();
+        recursiveFindBoxes(this, ret);
+        return ret;
+    }
+    
+    private void recursiveFindBoxes(AreaImpl root, Vector<Box> result)
+    {
+        result.addAll(root.getBoxes());
+        for (int i = 0; i < root.getChildCount(); i++)
+            recursiveFindBoxes((AreaImpl) root.getChildArea(i), result);
+    }
     /**
      * Set the borders around
      */
@@ -461,6 +479,12 @@ public class AreaImpl implements Area
     public int getChildCount()
     {
         return getNode().getChildCount();
+    }
+    
+    @Override
+    public int getDepth()
+    {
+        return getNode().getDepth();
     }
     
 	//=================================================================================
@@ -646,13 +670,14 @@ public class AreaImpl implements Area
     /**
      * @return true if the area contains replaced boxes only
      */
+    @Override
     public boolean isReplaced()
     {
         boolean empty = true;
         for (Box root : boxes)
         {
             empty = false;
-            if (root.getContentObject() == null)
+            if (root.getType() != Box.Type.REPLACED_CONTENT)
                 return false;
         }
         return !empty;
