@@ -221,7 +221,7 @@ public class AreaTree implements SearchableAreaContainer
     
     private void recursiveGetTags(Area root, Set<Tag> dest)
     {
-        dest.addAll(root.getTags());
+        dest.addAll(root.getTags().keySet());
         for (int i = 0; i < root.getChildCount(); i++)
             recursiveGetTags(root.getChildArea(i), dest);
     }

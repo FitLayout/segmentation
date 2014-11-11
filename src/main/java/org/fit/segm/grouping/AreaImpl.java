@@ -7,8 +7,10 @@ package org.fit.segm.grouping;
 
 import java.awt.Color;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.Vector;
 
@@ -47,7 +49,7 @@ public class AreaImpl implements Area
     protected Rectangular gp;
     
     /** Assigned tags */
-    protected Set<Tag> tags;
+    protected Map<Tag, Float> tags;
     
 	/**
 	 * The visual boxes that form this area.
@@ -132,7 +134,7 @@ public class AreaImpl implements Area
         bgcolor = null;
         grid = null;
         gp = new Rectangular();
-        tags = new HashSet<Tag>();
+        tags = new HashMap<Tag, Float>();
         setNode(new AreaNode(this));
 	}
     
@@ -152,7 +154,7 @@ public class AreaImpl implements Area
         bgcolor = null;
         grid = null;
         gp = new Rectangular();
-        tags = new HashSet<Tag>();
+        tags = new HashMap<Tag, Float>();
         setNode(new AreaNode(this));
     }
     
@@ -175,7 +177,7 @@ public class AreaImpl implements Area
         backgroundSeparated = box.isBackgroundSeparated();
         grid = null;
         gp = new Rectangular();
-        tags = new HashSet<Tag>();
+        tags = new HashMap<Tag, Float>();
         setNode(new AreaNode(this));
     }
     
@@ -200,7 +202,7 @@ public class AreaImpl implements Area
         backgroundSeparated = box.isBackgroundSeparated();
         grid = null;
         gp = new Rectangular();
-        tags = new HashSet<Tag>();
+        tags = new HashMap<Tag, Float>();
         setNode(new AreaNode(this));
     }
     
@@ -234,7 +236,7 @@ public class AreaImpl implements Area
         lineThroughSum = src.lineThroughSum;
         grid = null;
         gp = new Rectangular();
-        tags = new HashSet<Tag>();
+        tags = new HashMap<Tag, Float>();
         setNode(new AreaNode(this));
     }
     
@@ -1116,9 +1118,9 @@ public class AreaImpl implements Area
      * @param tag the tag to be added.
      */
     @Override
-    public void addTag(Tag tag)
+    public void addTag(Tag tag, float support)
     {
-        tags.add(tag);
+        tags.put(tag, support);
     }
     
     /**
@@ -1129,7 +1131,17 @@ public class AreaImpl implements Area
     @Override
     public boolean hasTag(Tag tag)
     {
-        return tags.contains(tag);
+        return tags.get(tag) != null;
+    }
+    
+    @Override
+    public float getTagSupport(Tag tag)
+    {
+    	Float f = tags.get(tag);
+    	if (f == null)
+    		return 0.0f;
+    	else
+    		return f;
     }
     
     /**
@@ -1138,7 +1150,8 @@ public class AreaImpl implements Area
      */
     public void removeAllTags(Collection<Tag> c)
     {
-        tags.removeAll(c);
+    	for (Tag t : c)
+    		tags.remove(t);
     }
     
     /**
@@ -1164,7 +1177,7 @@ public class AreaImpl implements Area
      * @return a set of tags
      */
     @Override
-    public Set<Tag> getTags()
+    public Map<Tag, Float> getTags()
     {
         return tags;
     }
@@ -1175,9 +1188,9 @@ public class AreaImpl implements Area
      */
     public Set<Tag> getAllTags()
     {
-        Set<Tag> ret = new HashSet<Tag>(tags);
+        Set<Tag> ret = new HashSet<Tag>(tags.keySet());
         for (int i = 0; i < getNode().getChildCount(); i++)
-            ret.addAll(getNode().getChildArea(i).getArea().getTags());
+            ret.addAll(getNode().getChildArea(i).getArea().getTags().keySet());
         return ret;
     }
     
