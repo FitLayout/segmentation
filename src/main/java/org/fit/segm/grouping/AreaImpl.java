@@ -1144,6 +1144,22 @@ public class AreaImpl implements Area
     		return f;
     }
     
+    @Override
+    public Tag getMostSupportedTag()
+    {
+    	float max = -1.0f;
+    	Tag ret = null;
+    	for (Map.Entry<Tag, Float> entry : tags.entrySet())
+    	{
+    		if (entry.getValue() > max)
+    		{
+    			max = entry.getValue();
+    			ret = entry.getKey();
+    		}
+    	}
+    	return ret;
+    }
+    
     /**
      * Removes all tags that belong to the given collection.
      * @param c A collection of tags to be removed.
