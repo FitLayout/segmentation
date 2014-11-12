@@ -6,7 +6,7 @@
 	 -->
 	
 	<groupId>cz.vutbr.fit.layout</groupId>
-	<artifactId>segmentation</artifactId>
+	<artifactId>layout-segmentation</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>LayoutSegm</name>
 	
