@@ -8,13 +8,12 @@ package org.fit.segm.grouping;
 import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Set;
 import java.util.Vector;
 
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.ContentObject;
@@ -41,6 +40,9 @@ public class AreaImpl implements Area
 
     /** A grid of inserted elements */
     protected AreaGrid grid;
+    
+    /** Area topology */
+    protected AreaTopology topology;
     
     /** Set of separators */
     private SeparatorSet seps;
@@ -78,6 +80,16 @@ public class AreaImpl implements Area
     private int level = 0;
     
     /**
+     * Previous area on the same line
+     */
+    private AreaImpl previousOnLine = null;
+    
+    /** 
+     * Next area on the same line
+     */
+    private AreaImpl nextOnLine = null;
+    
+    /**
      * Borders present?
      */
     private int btop, bleft, bbottom, bright;
@@ -92,7 +104,9 @@ public class AreaImpl implements Area
      */
     private boolean backgroundSeparated;
     
-    /** Explicitly separated area */
+    /**
+     * Explicitly separated area
+     */
     private boolean separated;
     
     /**
@@ -304,6 +318,19 @@ public class AreaImpl implements Area
     }
 
     @Override
+    public Area getPreviousSibling()
+    {
+        return ((AreaNode) getNode().getPreviousSibling()).getArea();
+    }
+    
+    @Override
+    public Area getNextSibling()
+    {
+        return ((AreaNode) getNode().getNextSibling()).getArea();
+    }
+
+    
+    @Override
     public Area getChildArea(int index) throws ArrayIndexOutOfBoundsException
     {
         return getNode().getChildArea(index).getArea();
@@ -316,11 +343,11 @@ public class AreaImpl implements Area
     }
     
     @Override
-    public Rectangular getGridBounds()
+    public boolean isLeaf()
     {
-        return gp;
+        return getNode().isLeaf();
     }
-
+    
     /**
      * Joins another area to this area. Update the bounds and the name accordingly.
      * @param other The area to be joined to this area.
@@ -378,6 +405,13 @@ public class AreaImpl implements Area
         name = name + " . " + other.name;
     }
     
+    public AreaTopology getTopology()
+    {
+        if (topology == null)
+            topology = new GridTopology(this);
+        return topology;
+    }
+    
     /**
      * Sets the name of the area. The name is used when the area information is displayed
      * using <code>toString()</code>
@@ -403,6 +437,26 @@ public class AreaImpl implements Area
 		this.level = level;
 	}
 
+    public AreaImpl getPreviousOnLine()
+    {
+        return previousOnLine;
+    }
+
+    public void setPreviousOnLine(AreaImpl previousOnLine)
+    {
+        this.previousOnLine = previousOnLine;
+    }
+
+    public AreaImpl getNextOnLine()
+    {
+        return nextOnLine;
+    }
+
+    public void setNextOnLine(AreaImpl nextOnLine)
+    {
+        this.nextOnLine = nextOnLine;
+    }
+    
 	public String toString()
     {
         String bs = "";
@@ -639,6 +693,20 @@ public class AreaImpl implements Area
         return !boxes.isEmpty();
     }
     
+    @Override
+    public Color getEffectiveBackgroundColor()
+    {
+        if (getBackgroundColor() != null)
+            return getBackgroundColor();
+        else
+        {
+            if (getParentArea() != null)
+                return getParentArea().getEffectiveBackgroundColor();
+            else
+                return Color.WHITE; //use white as the default root color
+        }
+    }
+    
     //======================================================================================
     
     /**
@@ -687,7 +755,7 @@ public class AreaImpl implements Area
     
     /**
      * Returns the text string represented by a concatenation of all
-     * the boxes contained directly in this area.
+     * the boxes contained directly in this area (no subareas)
      */
     public String getBoxText()
     {
@@ -1196,18 +1264,6 @@ public class AreaImpl implements Area
     public Map<Tag, Float> getTags()
     {
         return tags;
-    }
-    
-    /**
-     * Obtains all the tags assigned to this area and its child areas (not all descendant areas).
-     * @return a set of tags
-     */
-    public Set<Tag> getAllTags()
-    {
-        Set<Tag> ret = new HashSet<Tag>(tags.keySet());
-        for (int i = 0; i < getNode().getChildCount(); i++)
-            ret.addAll(getNode().getChildArea(i).getArea().getTags().keySet());
-        return ret;
     }
     
 	//=================================================================================
