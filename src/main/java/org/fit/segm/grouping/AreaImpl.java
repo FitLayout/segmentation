@@ -314,7 +314,8 @@ public class AreaImpl implements Area
     @Override
     public Area getParentArea()
     {
-        return getNode().getParentArea().getArea();
+        AreaNode pn = getNode().getParentArea(); 
+        return pn == null ? null : pn.getArea();
     }
 
     @Override
