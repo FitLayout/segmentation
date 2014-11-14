@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -338,15 +339,57 @@ public class AreaImpl implements Area
     }
 
     @Override
+    public List<Area> getChildren()
+    {
+        Vector<AreaNode> childNodes = getNode().getChildAreas();
+        Vector<Area> ret = new Vector<Area>(childNodes.size());
+        for (AreaNode node : childNodes)
+            ret.add(node.getArea());
+        return ret;
+    }
+    
+    @Override
     public void appendChild(Area child)
     {
         getNode().addArea(((AreaImpl) child).getNode());
     }
     
     @Override
+    public void removeChild(Area child)
+    {
+        getNode().remove(((AreaImpl) child).getNode());
+    }
+    
+    @Override
     public boolean isLeaf()
     {
         return getNode().isLeaf();
+    }
+    
+    /**
+     * Joins this area with another area and updates the layout in the grid to the given values.
+     * Moves the children of the other areas to this area.
+     * @param other The area to be joined to this area
+     * @param pos The position of the result in the grid
+     * @param horizontal Horizontal or vertical join?
+     */
+    //@SuppressWarnings({ "rawtypes", "unchecked" })
+    public void joinArea(AreaImpl other, Rectangular pos, boolean horizontal)
+    {
+        gp = pos;
+        if (other.getChildCount() > 0)
+        {
+            Vector<Area> adopt = new Vector<Area>(other.getChildren());
+            for (Iterator<Area> it = adopt.iterator(); it.hasNext();)
+                appendChild(it.next());
+        }
+        join(other, horizontal);
+        //copy the tag while preserving the higher support //TODO is this corect?
+        for (Map.Entry<Tag, Float> entry : other.getTags().entrySet())
+        {
+            if (!tags.containsKey(entry.getKey()) || entry.getValue() > tags.get(entry.getKey()))
+                tags.put(entry.getKey(), entry.getValue());
+        }
     }
     
     /**

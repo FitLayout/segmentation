@@ -85,7 +85,7 @@ public class AreaNode extends DefaultMutableTreeNode
      * @return a vector of the child areas 
      */
     @SuppressWarnings("unchecked")
-    public Vector<? extends AreaNode> getChildAreas()
+    public Vector<AreaNode> getChildAreas()
     {
         return this.children;
     }
