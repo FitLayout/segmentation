@@ -3,12 +3,13 @@
  *
  * Created on 24.5.2011, 14:44:33 by burgetr
  */
-package org.fit.segm.grouping;
+package org.fit.segm.grouping.op;
 
 import java.util.Iterator;
 import java.util.Vector;
 
 import org.fit.layout.model.Area;
+import org.fit.segm.grouping.AreaImpl;
 
 /**
  * A horizntal/vertical separator detection with shrinking. The separator set is created by splitting the horizontal and vertical separators independently.

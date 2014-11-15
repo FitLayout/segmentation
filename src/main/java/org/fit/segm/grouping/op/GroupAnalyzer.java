@@ -3,9 +3,13 @@
  *
  * Created on 23.1.2007, 14:16:41 by burgetr
  */
-package org.fit.segm.grouping;
+package org.fit.segm.grouping.op;
 
 import java.util.Vector;
+
+import org.fit.segm.grouping.AreaGrid;
+import org.fit.segm.grouping.AreaImpl;
+import org.fit.segm.grouping.AreaNode;
 
 /**
  * A general analyzer to find area groups

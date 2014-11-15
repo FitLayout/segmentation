@@ -2,9 +2,10 @@
  * 
  */
 
-package org.fit.segm.grouping;
+package org.fit.segm.grouping.op;
 
 import org.fit.layout.model.Rectangular;
+import org.fit.segm.grouping.AreaImpl;
 
 /**
  * @author radek

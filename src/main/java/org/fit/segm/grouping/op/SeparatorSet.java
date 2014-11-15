@@ -1,13 +1,14 @@
 /**
  * 
  */
-package org.fit.segm.grouping;
+package org.fit.segm.grouping.op;
 
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Vector;
 
 import org.fit.layout.model.Area;
+import org.fit.segm.grouping.AreaImpl;
 
 /**
  * A generic set of horizontal and vertical separators for a page.
@@ -171,7 +172,7 @@ public abstract class SeparatorSet
      * Applies various filters on the current separator sets in order to remove irrelevant separators or adjust the sizes.
      * This must be called manually after the final results are obtained.
      */
-    protected void applyFinalFilters()
+    public void applyFinalFilters()
     {
         //this is the default implementation - we filter the separators by their widths and we process the intersections somehow
         filterMarginalSeparators();

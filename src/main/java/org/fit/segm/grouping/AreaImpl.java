@@ -21,6 +21,8 @@ import org.fit.layout.model.ContentObject;
 import org.fit.layout.model.Page;
 import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
+import org.fit.segm.grouping.op.Separator;
+import org.fit.segm.grouping.op.SeparatorSet;
 
 /**
  * An area containing several visual boxes.
@@ -358,6 +360,18 @@ public class AreaImpl implements Area
     public void removeChild(Area child)
     {
         getNode().remove(((AreaImpl) child).getNode());
+    }
+    
+    @Override
+    public void insertChild(Area child, int index)
+    {
+        getNode().insert(((AreaImpl) child).getNode(), index);
+    }
+
+    @Override
+    public int getIndex(Area child)
+    {
+        return getNode().getIndex(((AreaImpl) child).getNode());
     }
     
     @Override
@@ -1168,6 +1182,154 @@ public class AreaImpl implements Area
     }
     
     /**
+     * Removes simple separators from current separator set. A simple separator
+     * has only one or zero visual areas at each side
+     */
+    public void removeSimpleSeparators()
+    {
+        removeSimpleSeparators(seps.getHorizontal());
+        removeSimpleSeparators(seps.getVertical());
+        removeSimpleSeparators(seps.getBoxsep());
+    }
+    
+    /**
+     * Removes simple separators from a vector of separators. A simple separator
+     * has only one or zero visual areas at each side
+     */
+    private void removeSimpleSeparators(Vector<Separator> v)
+    {
+        //System.out.println("Rem: this="+this);
+        for (Iterator<Separator> it = v.iterator(); it.hasNext();)
+        {
+            Separator sep = it.next();
+            if (sep.getType() == Separator.HORIZONTAL || sep.getType() == Separator.BOXH)
+            {
+                int a = countAreasAbove(sep);
+                int b = countAreasBelow(sep);
+                if (a <= 1 && b <= 1)
+                    it.remove();
+            }
+            else
+            {
+                int a = countAreasLeft(sep);
+                int b = countAreasRight(sep);
+                if (a <= 1 && b <= 1)
+                    it.remove();
+            }
+        }
+    }
+
+    /**
+     * @return the number of the areas directly above the separator
+     */
+    private int countAreasAbove(Separator sep)
+    {
+        int gx1 = grid.findCellX(sep.getX1());
+        int gx2 = grid.findCellX(sep.getX2());
+        int gy = grid.findCellY(sep.getY1() - 1);
+        int ret = 0;
+        if (gx1 >= 0 && gx2 >= 0 && gy >= 0)
+        {
+            int i = gx1;
+            while (i <= gx2)
+            {
+                AreaImpl node = grid.getAreaAt(i, gy);
+                //System.out.println("Search: " + i + ":" + gy + " = " + node);
+                if (node != null)
+                {
+                    ret++;
+                    i += node.getGridWidth();
+                }
+                else
+                    i++;
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * @return the number of the areas directly below the separator
+     */
+    private int countAreasBelow(Separator sep)
+    {
+        int gx1 = grid.findCellX(sep.getX1());
+        int gx2 = grid.findCellX(sep.getX2());
+        int gy = grid.findCellY(sep.getY2() + 1);
+        int ret = 0;
+        if (gx1 >= 0 && gx2 >= 0 && gy >= 0)
+        {
+            int i = gx1;
+            while (i <= gx2)
+            {
+                AreaImpl node = grid.getAreaAt(i, gy);
+                //System.out.println("Search: " + i + ":" + gy + " = " + node);
+                if (node != null)
+                {
+                    ret++;
+                    i += node.getGridWidth();
+                }
+                else
+                    i++;
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * @return the number of the areas directly on the left of the separator
+     */
+    private int countAreasLeft(Separator sep)
+    {
+        int gy1 = grid.findCellY(sep.getY1());
+        int gy2 = grid.findCellY(sep.getY2());
+        int gx = grid.findCellX(sep.getX1() - 1);
+        int ret = 0;
+        if (gy1 >= 0 && gy2 >= 0 && gx >= 0)
+        {
+            int i = gy1;
+            while (i <= gy2)
+            {
+                AreaImpl node = grid.getAreaAt(gx, i);
+                if (node != null)
+                {
+                    ret++;
+                    i += node.getGridWidth();
+                }
+                else
+                    i++;
+            }
+        }
+        return ret;
+    }
+    
+    /**
+     * @return the number of the areas directly on the left of the separator
+     */
+    private int countAreasRight(Separator sep)
+    {
+        int gy1 = grid.findCellY(sep.getY1());
+        int gy2 = grid.findCellY(sep.getY2());
+        int gx = grid.findCellX(sep.getX2() + 1);
+        int ret = 0;
+        if (gy1 >= 0 && gy2 >= 0 && gx >= 0)
+        {
+            int i = gy1;
+            while (i <= gy2)
+            {
+                AreaImpl node = grid.getAreaAt(gx, i);
+                if (node != null)
+                {
+                    ret++;
+                    i += node.getGridWidth();
+                }
+                else
+                    i++;
+            }
+        }
+        return ret;
+    }
+    
+    /**
      * Looks for the nearest text box area placed above the separator. If there are more
      * such areas in the same distance, the leftmost one is returned.
      * @param sep the separator 
@@ -1505,6 +1667,5 @@ public class AreaImpl implements Area
     {
         return getStyle().isSameStyle(other.getStyle());
     }
-    
     
 }

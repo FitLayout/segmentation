@@ -5,6 +5,11 @@
  */
 package org.fit.segm.grouping;
 
+import org.fit.segm.grouping.op.GroupAnalyzer;
+import org.fit.segm.grouping.op.GroupAnalyzerByStyles;
+import org.fit.segm.grouping.op.SeparatorSet;
+import org.fit.segm.grouping.op.SeparatorSetHVS;
+
 
 /**
  * Segmenation algorithm configuration. This class allows to select the implementation of used algorithms.

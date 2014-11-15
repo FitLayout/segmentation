@@ -3,12 +3,13 @@
  *
  * Created on 23.1.2007, 15:49:52 by burgetr
  */
-package org.fit.segm.grouping;
+package org.fit.segm.grouping.op;
 
 import java.util.Iterator;
 import java.util.Vector;
 
 import org.fit.layout.model.Rectangular;
+import org.fit.segm.grouping.AreaImpl;
 
 /**
  * This group analyzer tries to expand the selected box to all directions stopping on 
