@@ -82,7 +82,7 @@ public class SuperAreaOperator implements AreaTreeOperator
                 GroupAnalyzer groups = createGroupAnalyzer(root);
                 
                 Vector<Area> chld = new Vector<Area>();
-                chld.addAll(root.getChildren());
+                chld.addAll(root.getChildAreas());
                 while (chld.size() > 1) //we're not going to group a single element
                 {
                     //get the super area

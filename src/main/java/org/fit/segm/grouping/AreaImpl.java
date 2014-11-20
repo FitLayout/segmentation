@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.fit.layout.impl.GenericTreeNode;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.Box;
@@ -29,7 +30,7 @@ import org.fit.segm.grouping.op.SeparatorSet;
  * 
  * @author radek
  */
-public class AreaImpl implements Area
+public class AreaImpl extends GenericTreeNode implements Area
 {
     private static int nextid = 1;
     
@@ -38,9 +39,6 @@ public class AreaImpl implements Area
     /** The page this area belongs to */
     protected Page page;
     
-    /** The node that holds the area in the tree of areas */
-    protected AreaNode node;
-
     /** A grid of inserted elements */
     protected AreaGrid grid;
     
@@ -152,7 +150,6 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashMap<Tag, Float>();
-        setNode(new AreaNode(this));
 	}
     
     /** 
@@ -172,7 +169,6 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashMap<Tag, Float>();
-        setNode(new AreaNode(this));
     }
     
     /** 
@@ -195,7 +191,6 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashMap<Tag, Float>();
-        setNode(new AreaNode(this));
     }
     
     /** 
@@ -220,7 +215,6 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashMap<Tag, Float>();
-        setNode(new AreaNode(this));
     }
     
     /** 
@@ -254,7 +248,6 @@ public class AreaImpl implements Area
         grid = null;
         gp = new Rectangular();
         tags = new HashMap<Tag, Float>();
-        setNode(new AreaNode(this));
     }
     
     /**
@@ -266,24 +259,6 @@ public class AreaImpl implements Area
         return id;
     }
     
-    /**
-     * Obtains the node that holds the area in the area tree.
-     * @return the node or {@code null} when the area is not placed in a tree
-     */
-    public AreaNode getNode()
-    {
-        return node;
-    }
-
-    /**
-     * Sets the node that holds the area in the area tree.
-     * @param node the tree node.
-     */
-    public void setNode(AreaNode node)
-    {
-        this.node = node;
-    }
-
     /**
      * Sets the page this area belongs to.
      * @param page the page to be assigned to this area
@@ -317,67 +292,61 @@ public class AreaImpl implements Area
     @Override
     public Area getParentArea()
     {
-        AreaNode pn = getNode().getParentArea(); 
-        return pn == null ? null : pn.getArea();
+    	return (Area) getParent();
     }
 
     @Override
     public Area getPreviousSibling()
     {
-        return ((AreaNode) getNode().getPreviousSibling()).getArea();
+        return (Area) getPreviousSibling();
     }
     
     @Override
     public Area getNextSibling()
     {
-        return ((AreaNode) getNode().getNextSibling()).getArea();
+        return (Area) getNextSibling();
     }
 
     
     @Override
     public Area getChildArea(int index) throws ArrayIndexOutOfBoundsException
     {
-        return getNode().getChildArea(index).getArea();
+    	return (Area) getChildAt(index);
     }
 
     @Override
-    public List<Area> getChildren()
+    public List<Area> getChildAreas()
     {
-        Vector<AreaNode> childNodes = getNode().getChildAreas();
-        Vector<Area> ret = new Vector<Area>(childNodes.size());
-        for (AreaNode node : childNodes)
-            ret.add(node.getArea());
-        return ret;
-    }
-    
-    @Override
-    public void appendChild(Area child)
-    {
-        getNode().addArea(((AreaImpl) child).getNode());
-    }
-    
-    @Override
-    public void removeChild(Area child)
-    {
-        getNode().remove(((AreaImpl) child).getNode());
-    }
-    
-    @Override
-    public void insertChild(Area child, int index)
-    {
-        getNode().insert(((AreaImpl) child).getNode(), index);
+    	Vector<Area> ret = new Vector<Area>(getChildCount());
+    	for (GenericTreeNode child : getChildren())
+    		ret.add((AreaImpl) child);
+    	return ret;
     }
 
     @Override
     public int getIndex(Area child)
     {
-        return getNode().getIndex(((AreaImpl) child).getNode());
+    	return super.getIndex((AreaImpl) child);
     }
     
     @Override
-    public boolean isLeaf()
+    public void appendChild(Area child)
     {
-        return getNode().isLeaf();
+        add((AreaImpl) child);
+        getBounds().expandToEnclose(child.getBounds());
+        updateAverages((AreaImpl) child);
+    }
+    
+    @Override
+    public void insertChild(Area child, int index)
+    {
+    	insert((AreaImpl) child, index);
+    }
+
+    @Override
+    public void removeChild(Area child)
+    {
+    	remove((AreaImpl) child); 
     }
     
     /**
@@ -393,9 +362,9 @@ public class AreaImpl implements Area
         gp = pos;
         if (other.getChildCount() > 0)
         {
-            Vector<Area> adopt = new Vector<Area>(other.getChildren());
-            for (Iterator<Area> it = adopt.iterator(); it.hasNext();)
-                appendChild(it.next());
+            Vector<GenericTreeNode> adopt = new Vector<GenericTreeNode>(other.getChildren());
+            for (Iterator<GenericTreeNode> it = adopt.iterator(); it.hasNext();)
+                appendChild((AreaImpl) it.next());
         }
         join(other, horizontal);
         //copy the tag while preserving the higher support //TODO is this corect?
@@ -589,18 +558,6 @@ public class AreaImpl implements Area
     	bright = right;
     }
 
-    @Override
-    public int getChildCount()
-    {
-        return getNode().getChildCount();
-    }
-    
-    @Override
-    public int getDepth()
-    {
-        return getNode().getDepth();
-    }
-    
 	//=================================================================================
 	
     @Override
@@ -1027,7 +984,7 @@ public class AreaImpl implements Area
     public String getText()
     {
         String ret = "";
-        if (getNode().isLeaf())
+        if (isLeaf())
             ret = getBoxText();
         else
             for (int i = 0; i < getChildCount(); i++)
@@ -1127,11 +1084,11 @@ public class AreaImpl implements Area
      */
     public AreaImpl getChildAtGridPos(int x, int y)
     {
-        for (int i = 0; i < getNode().getChildCount(); i++)
+        for (GenericTreeNode child : getChildren())
         {
-            AreaImpl child = getNode().getChildArea(i).getArea();
-            if (child.getGridPosition().contains(x, y))
-                return child;
+            AreaImpl childarea = (AreaImpl) child;
+            if (childarea.getGridPosition().contains(x, y))
+                return childarea;
         }
         return null;
     }
@@ -1142,11 +1099,11 @@ public class AreaImpl implements Area
     public Vector<AreaImpl> getChildNodesInside(Rectangular r)
     {
         Vector<AreaImpl> ret = new Vector<AreaImpl>();
-        for (int i = 0; i < getNode().getChildCount(); i++)
+        for (GenericTreeNode child : getChildren())
         {
-            AreaImpl child = getNode().getChildArea(i).getArea();
-            if (child.getBounds().intersects(r))
-                ret.add(child);
+            AreaImpl childarea = (AreaImpl) child;
+            if (childarea.getBounds().intersects(r))
+                ret.add(childarea);
         }
         return ret;
     }
@@ -1156,10 +1113,10 @@ public class AreaImpl implements Area
      */
     public boolean isAreaEmpty(Rectangular r)
     {
-        for (int i = 0; i < getNode().getChildCount(); i++)
+        for (GenericTreeNode child : getChildren())
         {
-            AreaNode child = getNode().getChildArea(i);
-            if (child.getArea().getBounds().intersects(r))
+            AreaImpl childarea = (AreaImpl) child;
+            if (childarea.getBounds().intersects(r))
                 return false;
         }
         return true;
@@ -1455,8 +1412,8 @@ public class AreaImpl implements Area
             return true;
         else
         {
-            for (int i = 0; i < getNode().getChildCount(); i++)
-                if (getNode().getChildArea(i).getArea().hasTag(tag))
+            for (GenericTreeNode child : getChildren())
+                if (((AreaImpl) child).hasTag(tag))
                     return true;
             return false;
         }

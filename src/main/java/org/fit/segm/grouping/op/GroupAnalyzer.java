@@ -9,7 +9,6 @@ import java.util.Vector;
 
 import org.fit.segm.grouping.AreaGrid;
 import org.fit.segm.grouping.AreaImpl;
-import org.fit.segm.grouping.AreaNode;
 
 /**
  * A general analyzer to find area groups
@@ -47,7 +46,7 @@ public class GroupAnalyzer
     	/* This is a simple testing SuperArea implementation. It groups each 
     	 * subarea with its first sibling area.*/ 
         AreaImpl ret = new AreaImpl(0, 0, 0, 0);
-        AreaImpl sibl = ((AreaNode) sub.getNode().getNextSibling()).getArea();
+        AreaImpl sibl = (AreaImpl) sub.getNextSibling();
         selected.removeAllElements();
         selected.add(sub);
         if (sibl != null)

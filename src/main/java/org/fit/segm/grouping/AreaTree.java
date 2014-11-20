@@ -57,7 +57,6 @@ public class AreaTree implements SearchableAreaContainer
     public Area findBasicAreas()
     {
         rootarea = new AreaImpl(0, 0, 0, 0);
-        new AreaNode(rootarea);
         for (int i = 0; i < boxtree.getRoot().getChildCount(); i++)
         {
             Area sub;

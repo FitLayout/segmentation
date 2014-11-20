@@ -7,6 +7,7 @@ package org.fit.segm.grouping;
 
 import java.util.*;
 
+import org.fit.layout.impl.GenericTreeNode;
 import org.fit.layout.model.Rectangular;
 
 /**
@@ -104,14 +105,13 @@ public class AreaGrid
      * @param y the <code>y</code> coordinate of the grid cell  
      * @return the node at the specified position or null if there is no node
      */
-    @SuppressWarnings("rawtypes")
     public AreaImpl getAreaAt(int x, int y)
     {
         if (x < width && y < height)
         {
-            for (Enumeration e = parent.getNode().children(); e.hasMoreElements(); )
+            for (GenericTreeNode area : parent.getChildren())
             {
-                AreaImpl node = ((AreaNode) e.nextElement()).getArea();
+                AreaImpl node = (AreaImpl) area;
                 if (x >= node.getGridX() && x < node.getGridX() + node.getGridWidth() &&
                     y >= node.getGridY() && y < node.getGridY() + node.getGridHeight())
                     return node;
@@ -255,17 +255,17 @@ public class AreaGrid
     /**
      * Goes through the child areas and creates a list of collumns
      */
-    @SuppressWarnings("rawtypes")
 	private void calculateColumns()
     {
         //create the sorted list of points
-        GridPoint points[] = new GridPoint[parent.getNode().getChildCount() * 2];
+        GridPoint points[] = new GridPoint[parent.getChildCount() * 2];
         int pi = 0;
-        for (Enumeration e = parent.getNode().children(); e.hasMoreElements(); pi += 2)
+        for (GenericTreeNode node : parent.getChildren())
         {
-            AreaImpl area = ((AreaNode) e.nextElement()).getArea();
+            AreaImpl area = (AreaImpl) node;
             points[pi] = new GridPoint(area.getX1(), area, true);
             points[pi+1] = new GridPoint(area.getX2() + 1, area, false);
+            pi += 2;
             //X2+1 ensures that the end of one box will be on the same point
             //as the start of the following box
         }
@@ -323,17 +323,17 @@ public class AreaGrid
     /**
      * Goes through the child areas and creates a list of rows
      */
-    @SuppressWarnings("rawtypes")
 	private void calculateRows()
     {
         //create the sorted list of points
-        GridPoint points[] = new GridPoint[parent.getNode().getChildCount() * 2];
+        GridPoint points[] = new GridPoint[parent.getChildCount() * 2];
         int pi = 0;
-        for (Enumeration e = parent.getNode().children(); e.hasMoreElements(); pi += 2)
+        for (GenericTreeNode node : parent.getChildren())
         {
-            AreaImpl area = ((AreaNode) e.nextElement()).getArea();
+            AreaImpl area = (AreaImpl) node;
             points[pi] = new GridPoint(area.getY1(), area, true);
             points[pi+1] = new GridPoint(area.getY2() + 1, area, false);
+            pi += 2;
             //Y2+1 ensures that the end of one box will be on the same point
             //as the start of the following box
         }
