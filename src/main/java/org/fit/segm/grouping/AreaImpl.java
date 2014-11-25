@@ -6,21 +6,16 @@
 package org.fit.segm.grouping;
 
 import java.awt.Color;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
 import org.fit.layout.impl.DefaultArea;
 import org.fit.layout.impl.GenericTreeNode;
 import org.fit.layout.model.Area;
-import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.ContentObject;
-import org.fit.layout.model.Page;
 import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
 import org.fit.segm.grouping.op.Separator;
@@ -82,7 +77,7 @@ public class AreaImpl extends DefaultArea implements Area
     private float lineThroughSum = 0;
     private int lineThroughCnt = 0;
     
-    
+    //TODO create some grid topology
     
 	//================================================================================
 	
@@ -197,12 +192,12 @@ public class AreaImpl extends DefaultArea implements Area
             if (getX1() <= other.getX1())
             {
                 if (other.hasRightBorder())
-                    bright = other.getRightBorder();
+                    setRightBorder(other.getRightBorder());
             }
             else
             {
                 if (other.hasLeftBorder())
-                    bleft = other.getLeftBorder();
+                    setLeftBorder(other.getLeftBorder());
             }
         }
         else
@@ -210,21 +205,21 @@ public class AreaImpl extends DefaultArea implements Area
             if (getY1() <= other.getY1())
             {
                 if (other.hasBottomBorder())
-                    bbottom = other.getBottomBorder();
+                    setBottomBorder(other.getBottomBorder());
             }
             else
             {
                 if (other.hasTopBorder())
-                    btop = other.getTopBorder();
+                    setTopBorder(other.getTopBorder());
             }
         }
         //add all the contained boxes
-        boxes.addAll(other.boxes);
+        getBoxes().addAll(other.getBoxes());
         updateAverages(other);
         //just a test
         if (!this.hasSameBackground(other))
-        	System.err.println("Area: Warning: joining areas " + name + " and " + other.name + 
-        	        " of different background colors " + this.bgcolor + " x " + other.bgcolor); 
+        	System.err.println("Area: Warning: joining areas " + getName() + " and " + other.getName() + 
+        	        " of different background colors " + this.getBackgroundColor() + " x " + other.getBackgroundColor()); 
     }
     
     /**
@@ -234,15 +229,8 @@ public class AreaImpl extends DefaultArea implements Area
     public void joinChild(AreaImpl other)
     {
         //TODO obsah se neimportuje?
-        bounds.expandToEnclose(other.bounds);
-        name = name + " . " + other.name;
-    }
-    
-    public AreaTopology getTopology()
-    {
-        if (topology == null)
-            topology = new GridTopology(this);
-        return topology;
+        getBounds().expandToEnclose(other.getBounds());
+        setName(getName() + " . " + other.getName());
     }
     
 	public int getLevel()
@@ -291,8 +279,8 @@ public class AreaImpl extends DefaultArea implements Area
         /*if (isHorizontalSeparator()) bs += "H";
         if (isVerticalSeparator()) bs += "I";*/
         
-        /*if (bgcolor != null)
-            bs += "\"" + String.format("#%02x%02x%02x", bgcolor.getRed(), bgcolor.getGreen(), bgcolor.getBlue()) + "\"";*/
+        /*if (getBackgroundColor() != null)
+            bs += "\"" + String.format("#%02x%02x%02x", getBackgroundColor().getRed(), getBackgroundColor().getGreen(), getBackgroundColor().getBlue()) + "\"";*/
         
         if (getName() != null)
             return bs + " " + getName() + " " + getBounds().toString();
@@ -307,7 +295,7 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public void chooseBox(Box node)
     {
-    	if (bounds.encloses(node.getVisualBounds()))
+    	if (getBounds().encloses(node.getVisualBounds()))
     		addBox(node);
     }
     
@@ -321,23 +309,23 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public boolean hasSameBackground(AreaImpl other)
     {
-        return (bgcolor == null && other.bgcolor == null) || 
-               (bgcolor != null && other.bgcolor != null && bgcolor.equals(other.bgcolor));
+        return (getBackgroundColor() == null && other.getBackgroundColor() == null) || 
+               (getBackgroundColor() != null && other.getBackgroundColor() != null && getBackgroundColor().equals(other.getBackgroundColor()));
     }
     
     public boolean encloses(AreaImpl other)
     {
-    	return bounds.encloses(other.bounds);
+    	return getBounds().encloses(other.getBounds());
     }
     
     public boolean contains(int x, int y)
     {
-    	return bounds.contains(x, y);
+    	return getBounds().contains(x, y);
     }
     
     public boolean hasContent()
     {
-        return !boxes.isEmpty();
+        return !getBoxes().isEmpty();
     }
     
     @Override
@@ -361,7 +349,7 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public boolean containsText()
     {
-        for (Box root : boxes)
+        for (Box root : getBoxes())
         {
             if (recursiveContainsText(root))
                 return true;
@@ -391,7 +379,7 @@ public class AreaImpl extends DefaultArea implements Area
     public boolean isReplaced()
     {
         boolean empty = true;
-        for (Box root : boxes)
+        for (Box root : getBoxes())
         {
             empty = false;
             if (root.getType() != Box.Type.REPLACED_CONTENT)
@@ -408,7 +396,7 @@ public class AreaImpl extends DefaultArea implements Area
     {
         StringBuilder ret = new StringBuilder();
         boolean start = true;
-        for (Iterator<Box> it = boxes.iterator(); it.hasNext(); )
+        for (Iterator<Box> it = getBoxes().iterator(); it.hasNext(); )
         {
             if (!start) ret.append(' ');
             else start = false;
@@ -424,7 +412,7 @@ public class AreaImpl extends DefaultArea implements Area
     public int getTextLength()
     {
         int ret = 0;
-        for (Box box : boxes)
+        for (Box box : getBoxes())
         {
             ret += box.getText().length();
         }
@@ -436,7 +424,7 @@ public class AreaImpl extends DefaultArea implements Area
      */
 	public ContentObject getReplacedContent()
     {
-        for (Iterator<Box> it = boxes.iterator(); it.hasNext(); )
+        for (Iterator<Box> it = getBoxes().iterator(); it.hasNext(); )
         {
             ContentObject obj = recursiveGetReplacedContent(it.next());
             if (obj != null)
@@ -475,8 +463,8 @@ public class AreaImpl extends DefaultArea implements Area
     public boolean isHorizontalSeparator()
     {
         return !containsText() && 
-               bounds.getHeight() < 10 &&
-               bounds.getWidth() > 20 * bounds.getHeight();
+               getBounds().getHeight() < 10 &&
+               getBounds().getWidth() > 20 * getBounds().getHeight();
     }
     
     /**
@@ -487,8 +475,8 @@ public class AreaImpl extends DefaultArea implements Area
     public boolean isVerticalSeparator()
     {
         return !containsText() && 
-               bounds.getWidth() < 10 &&
-               bounds.getHeight() > 20 * bounds.getWidth();
+               getBounds().getWidth() < 10 &&
+               getBounds().getHeight() > 20 * getBounds().getWidth();
     }
     
     /**
@@ -508,8 +496,8 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public float getDeclaredFontSize()
     {
-        if (boxes.size() > 0)
-            return boxes.firstElement().getFontSize();
+        if (getBoxes().size() > 0)
+            return getBoxes().firstElement().getFontSize();
         else
             return 0;
     }
@@ -578,13 +566,13 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public float getColorLuminosity()
     {
-        if (boxes.isEmpty())
+        if (getBoxes().isEmpty())
             return 0;
         else
         {
             float sum = 0;
             int len = 0;
-            for (Box box : boxes)
+            for (Box box : getBoxes())
             {
                 int l = box.getText().length(); 
                 sum += colorLuminosity(box.getColor()) * l;
