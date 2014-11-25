@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
+import org.fit.layout.impl.DefaultArea;
 import org.fit.layout.impl.GenericTreeNode;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTopology;
@@ -30,49 +31,16 @@ import org.fit.segm.grouping.op.SeparatorSet;
  * 
  * @author radek
  */
-public class AreaImpl extends GenericTreeNode implements Area
+public class AreaImpl extends DefaultArea implements Area
 {
-    private static int nextid = 1;
-    
-    private int id;
-    
-    /** The page this area belongs to */
-    protected Page page;
-    
     /** A grid of inserted elements */
     protected AreaGrid grid;
-    
-    /** Area topology */
-    protected AreaTopology topology;
     
     /** Set of separators */
     private SeparatorSet seps;
     
     /** Position of this area in the parent grid */
     protected Rectangular gp;
-    
-    /** Assigned tags */
-    protected Map<Tag, Float> tags;
-    
-	/**
-	 * The visual boxes that form this area.
-	 */
-	private Vector<Box> boxes;
-	
-	/**
-	 * Declared bounds of the area.
-	 */
-	private Rectangular bounds;
-	
-	/**
-	 * Effective bounds of the area content.
-	 */
-	private Rectangular contentBounds;
-
-	/**
-     * Area description
-     */
-    private String name;
     
     /**
      * Area level. 0 corresponds to the areas formed by boxes, greater numbers represent
@@ -89,21 +57,6 @@ public class AreaImpl extends GenericTreeNode implements Area
      * Next area on the same line
      */
     private AreaImpl nextOnLine = null;
-    
-    /**
-     * Borders present?
-     */
-    private int btop, bleft, bbottom, bright;
-    
-    /**
-     * Background color of the first box in the area.
-     */
-    private Color bgcolor;
-    
-    /**
-     * Is the first box in the area separated by background?
-     */
-    private boolean backgroundSeparated;
     
     /**
      * Explicitly separated area
@@ -138,18 +91,7 @@ public class AreaImpl extends GenericTreeNode implements Area
      */
     public AreaImpl(int x1, int y1, int x2, int y2)
 	{
-        id = nextid++;
-		boxes = new Vector<Box>();
-		bounds = new Rectangular(x1, y1, x2, y2);
-        name = null;
-        btop = 0;
-        bleft = 0;
-        bright = 0;
-        bbottom = 0;
-        bgcolor = null;
-        grid = null;
-        gp = new Rectangular();
-        tags = new HashMap<Tag, Float>();
+        this(new Rectangular(x1, y1, x2, y2));
 	}
     
     /** 
@@ -157,18 +99,9 @@ public class AreaImpl extends GenericTreeNode implements Area
      */
     public AreaImpl(Rectangular r)
     {
-        id = nextid++;
-        boxes = new Vector<Box>();
-        bounds = new Rectangular(r);
-        name = null;
-        btop = 0;
-        bleft = 0;
-        bright = 0;
-        bbottom = 0;
-        bgcolor = null;
+        super(r);
         grid = null;
         gp = new Rectangular();
-        tags = new HashMap<Tag, Float>();
     }
     
     /** 
@@ -177,44 +110,20 @@ public class AreaImpl extends GenericTreeNode implements Area
      */
     public AreaImpl(Box box)
     {
-        id = nextid++;
-        boxes = new Vector<Box>();
-        addBox(box); //expands the content bounds appropriately
-        bounds = new Rectangular(contentBounds);
-        this.name = box.toString();
-        btop = box.getTopBorder();
-        bleft = box.getLeftBorder();
-        bright = box.getRightBorder();
-        bbottom = box.getBottomBorder();
-        bgcolor = box.getBackgroundColor();
-        backgroundSeparated = box.isBackgroundSeparated();
+        super(box);
         grid = null;
         gp = new Rectangular();
-        tags = new HashMap<Tag, Float>();
     }
     
     /** 
      * Creates an area from a a list of boxes. Update the area bounds and name accordingly.
      * @param boxes The source boxes that will be contained in this area
      */
-    public AreaImpl(Vector<Box> boxlist)
+    public AreaImpl(Vector<Box> boxList)
     {
-        id = nextid++;
-        boxes = new Vector<Box>(boxlist.size());
-        for (Box box : boxlist)
-            addBox(box); //expands the content bounds appropriately
-        Box box = boxlist.firstElement();
-        bounds = new Rectangular(contentBounds);
-        this.name = box.toString();
-        btop = box.getTopBorder();
-        bleft = box.getLeftBorder();
-        bright = box.getRightBorder();
-        bbottom = box.getBottomBorder();
-        bgcolor = box.getBackgroundColor();
-        backgroundSeparated = box.isBackgroundSeparated();
+        super(boxList);
         grid = null;
         gp = new Rectangular();
-        tags = new HashMap<Tag, Float>();
     }
     
     /** 
@@ -223,17 +132,7 @@ public class AreaImpl extends GenericTreeNode implements Area
      */
     public AreaImpl(AreaImpl src)
     {
-        id = nextid++;
-        boxes = new Vector<Box>(src.getBoxes());
-        contentBounds = (src.contentBounds == null) ? null : new Rectangular(src.contentBounds);
-        bounds = new Rectangular(src.bounds);
-        name = (src.name == null) ? null : new String(src.name);
-        btop = src.btop;
-        bleft = src.bleft;
-        bright = src.bright;
-        bbottom = src.bbottom;
-        bgcolor = (src.bgcolor == null) ? null : new Color(src.bgcolor.getRed(), src.bgcolor.getGreen(), src.bgcolor.getBlue());
-        backgroundSeparated = src.backgroundSeparated;
+        super(src);
         level = src.level;
         fontSizeSum = src.fontSizeSum;
         fontSizeCnt = src.fontStyleCnt;
@@ -247,106 +146,13 @@ public class AreaImpl extends GenericTreeNode implements Area
         lineThroughSum = src.lineThroughSum;
         grid = null;
         gp = new Rectangular();
-        tags = new HashMap<Tag, Float>();
-    }
-    
-    /**
-     * Obtains a unique ID of the area within the page.
-     * @return the area ID
-     */
-    public int getId()
-    {
-        return id;
-    }
-    
-    /**
-     * Sets the page this area belongs to.
-     * @param page the page to be assigned to this area
-     */
-    public void setPage(Page page)
-    {
-        this.page = page;
-    }
-
-    /**
-     * Obtains the page this node belongs to.
-     * @return the page assigned to this area
-     */
-    @Override
-    public Page getPage()
-    {
-        return page;
-    }
-
-    @Override
-    public int getBorderCount()
-    {
-        int bcnt = 0;
-        if (hasTopBorder()) bcnt++;
-        if (hasBottomBorder()) bcnt++;
-        if (hasLeftBorder()) bcnt++;
-        if (hasRightBorder()) bcnt++;
-        return bcnt;
-    }
-
-    @Override
-    public Area getParentArea()
-    {
-    	return (Area) getParent();
-    }
-
-    @Override
-    public Area getPreviousSibling()
-    {
-        return (Area) getPreviousSibling();
-    }
-    
-    @Override
-    public Area getNextSibling()
-    {
-        return (Area) getNextSibling();
-    }
-
-    
-    @Override
-    public Area getChildArea(int index) throws ArrayIndexOutOfBoundsException
-    {
-    	return (Area) getChildAt(index);
-    }
-
-    @Override
-    public List<Area> getChildAreas()
-    {
-    	Vector<Area> ret = new Vector<Area>(getChildCount());
-    	for (GenericTreeNode child : getChildren())
-    		ret.add((AreaImpl) child);
-    	return ret;
-    }
-
-    @Override
-    public int getIndex(Area child)
-    {
-    	return super.getIndex((AreaImpl) child);
     }
     
     @Override
     public void appendChild(Area child)
     {
-        add((AreaImpl) child);
-        getBounds().expandToEnclose(child.getBounds());
+        super.appendChild(child);
         updateAverages((AreaImpl) child);
-    }
-    
-    @Override
-    public void insertChild(Area child, int index)
-    {
-    	insert((AreaImpl) child, index);
-    }
-
-    @Override
-    public void removeChild(Area child)
-    {
-    	remove((AreaImpl) child); 
     }
     
     /**
@@ -370,8 +176,8 @@ public class AreaImpl extends GenericTreeNode implements Area
         //copy the tag while preserving the higher support //TODO is this corect?
         for (Map.Entry<Tag, Float> entry : other.getTags().entrySet())
         {
-            if (!tags.containsKey(entry.getKey()) || entry.getValue() > tags.get(entry.getKey()))
-                tags.put(entry.getKey(), entry.getValue());
+            if (!getTags().containsKey(entry.getKey()) || entry.getValue() > getTags().get(entry.getKey()))
+                getTags().put(entry.getKey(), entry.getValue());
         }
     }
     
@@ -383,8 +189,8 @@ public class AreaImpl extends GenericTreeNode implements Area
      */
     public void join(AreaImpl other, boolean horizontal)
     {
-    	bounds.expandToEnclose(other.bounds);
-    	name = name + " . " + other.name;
+    	getBounds().expandToEnclose(other.getBounds());
+    	setName(getName() + " . " + other.getName());
         //update border information according to the mutual area positions
         if (horizontal)
         {
@@ -439,21 +245,6 @@ public class AreaImpl extends GenericTreeNode implements Area
         return topology;
     }
     
-    /**
-     * Sets the name of the area. The name is used when the area information is displayed
-     * using <code>toString()</code>
-     * @param The new area name
-     */
-    public void setName(String name)
-    {
-        this.name = name;
-    }
-    
-    public String getName()
-    {
-    	return name;
-    }
-    
 	public int getLevel()
 	{
 		return level;
@@ -503,10 +294,10 @@ public class AreaImpl extends GenericTreeNode implements Area
         /*if (bgcolor != null)
             bs += "\"" + String.format("#%02x%02x%02x", bgcolor.getRed(), bgcolor.getGreen(), bgcolor.getBlue()) + "\"";*/
         
-        if (name != null)
-            return bs + " " + name + " " + bounds.toString();
+        if (getName() != null)
+            return bs + " " + getName() + " " + getBounds().toString();
         else
-            return bs + " " + "<area> " + bounds.toString();
+            return bs + " " + "<area> " + getBounds().toString();
           
     }
     
@@ -520,167 +311,8 @@ public class AreaImpl extends GenericTreeNode implements Area
     		addBox(node);
     }
     
-    /**
-     * Returns a vector of boxes that are inside of this area
-     * @return A vector containing the {@link org.burgetr.segm.BoxNode BoxNode} objects
-     */
-    public Vector<Box> getBoxes()
-    {
-    	return boxes;
-    }
-    
-    /** 
-     * Obtains all the boxes from this area and all the child areas.
-     * @return The list of boxes
-     */
-    @Override
-    public Vector<Box> getAllBoxes()
-    {
-        Vector<Box> ret = new Vector<Box>();
-        recursiveFindBoxes(this, ret);
-        return ret;
-    }
-    
-    private void recursiveFindBoxes(AreaImpl root, Vector<Box> result)
-    {
-        result.addAll(root.getBoxes());
-        for (int i = 0; i < root.getChildCount(); i++)
-            recursiveFindBoxes((AreaImpl) root.getChildArea(i), result);
-    }
-    /**
-     * Set the borders around
-     */
-    public void setBorders(int top, int left, int bottom, int right)
-    {
-    	btop = top;
-    	bleft = left;
-    	bbottom = bottom;
-    	bright = right;
-    }
-
 	//=================================================================================
 	
-    @Override
-    public Rectangular getBounds()
-    {
-    	return bounds;
-    }
-    
-    public void setBounds(Rectangular bounds)
-    {
-        this.bounds = bounds;
-    }
-    
-    public Rectangular getContentBounds()
-    {
-        return contentBounds;
-    }
-	
-    @Override
-    public int getX1()
-    {
-    	return bounds.getX1();
-    }
-    
-    @Override
-    public int getY1()
-    {
-    	return bounds.getY1();
-    }
-    
-    @Override
-    public int getX2()
-    {
-    	return bounds.getX2();
-    }
-    
-    @Override
-    public int getY2()
-    {
-    	return bounds.getY2();
-    }
-    
-    @Override
-    public int getWidth()
-    {
-    	return bounds.getWidth();
-    }
-    
-    @Override
-    public int getHeight()
-    {
-    	return bounds.getHeight();
-    }
-    
-    /**
-     * Computes the square area occupied by this visual area.
-     * @return the square area in pixels
-     */
-    public int getSquareArea()
-    {
-        return bounds.getArea();
-    }
-    
-    @Override
-    public boolean hasTopBorder()
-    {
-        return btop > 0;
-    }
-    
-    @Override
-    public int getTopBorder()
-    {
-        return btop;
-    }
-    
-    @Override
-    public boolean hasLeftBorder()
-    {
-        return bleft > 0;
-    }
-    
-    @Override
-    public int getLeftBorder()
-    {
-        return bleft;
-    }
-    
-    @Override
-    public boolean hasRightBorder()
-    {
-        return bright > 0;
-    }
-    
-    @Override
-    public int getRightBorder()
-    {
-        return bright;
-    }
-    
-    @Override
-    public boolean hasBottomBorder()
-    {
-        return bbottom > 0;
-    }
-    
-    @Override
-    public int getBottomBorder()
-    {
-        return bbottom;
-    }
-    
-    @Override
-    public Color getBackgroundColor()
-    {
-    	return bgcolor;
-    }
-    
-    @Override
-    public boolean isBackgroundSeparated()
-    {
-        return backgroundSeparated;
-    }
-    
     /**
      * Checks if this area has the same background color as another area
      * @param other the other area
@@ -1340,94 +972,6 @@ public class AreaImpl extends GenericTreeNode implements Area
         return ret;
     }
     
-    //====================================================================================
-    // tagging
-    //====================================================================================
-    
-    /**
-     * Adds a tag to this area.
-     * @param tag the tag to be added.
-     */
-    @Override
-    public void addTag(Tag tag, float support)
-    {
-        tags.put(tag, support);
-    }
-    
-    /**
-     * Tests whether the area has this tag.
-     * @param tag the tag to be tested.
-     * @return <code>true</code> if the area has this tag
-     */
-    @Override
-    public boolean hasTag(Tag tag)
-    {
-        return tags.get(tag) != null;
-    }
-    
-    @Override
-    public float getTagSupport(Tag tag)
-    {
-    	Float f = tags.get(tag);
-    	if (f == null)
-    		return 0.0f;
-    	else
-    		return f;
-    }
-    
-    @Override
-    public Tag getMostSupportedTag()
-    {
-    	float max = -1.0f;
-    	Tag ret = null;
-    	for (Map.Entry<Tag, Float> entry : tags.entrySet())
-    	{
-    		if (entry.getValue() > max)
-    		{
-    			max = entry.getValue();
-    			ret = entry.getKey();
-    		}
-    	}
-    	return ret;
-    }
-    
-    /**
-     * Removes all tags that belong to the given collection.
-     * @param c A collection of tags to be removed.
-     */
-    public void removeAllTags(Collection<Tag> c)
-    {
-    	for (Tag t : c)
-    		tags.remove(t);
-    }
-    
-    /**
-     * Tests whether the area or any of its <b>direct child</b> areas have the given tag.
-     * @param tag the tag to be tested.
-     * @return <code>true</code> if the area or its direct child areas have the given tag
-     */
-    public boolean containsTag(Tag tag)
-    {
-        if (hasTag(tag))
-            return true;
-        else
-        {
-            for (GenericTreeNode child : getChildren())
-                if (((AreaImpl) child).hasTag(tag))
-                    return true;
-            return false;
-        }
-    }
-    
-    /**
-     * Obtains the set of tags assigned to the area.
-     * @return a set of tags
-     */
-    @Override
-    public Map<Tag, Float> getTags()
-    {
-        return tags;
-    }
     
 	//=================================================================================
 
@@ -1435,16 +979,10 @@ public class AreaImpl extends GenericTreeNode implements Area
 	 * Adds a new box to the area and updates the area bounds.
 	 * @param box the new box to add
 	 */
-	private void addBox(Box box)
+	protected void addBox(Box box)
 	{
-		boxes.add(box);
+		super.addBox(box);
 
-        Rectangular sb = box.getVisualBounds();
-        if (contentBounds == null)
-        	contentBounds = new Rectangular(sb);
-        else if (sb.getWidth() > 0 && sb.getHeight() > 0)
-        	contentBounds.expandToEnclose(sb);
-        
         if (box.getType() == Box.Type.TEXT_CONTENT)
         {
             int len = box.getText().trim().length();
