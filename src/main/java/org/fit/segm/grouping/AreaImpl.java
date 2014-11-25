@@ -77,8 +77,6 @@ public class AreaImpl extends DefaultArea implements Area
     public AreaImpl(Rectangular r)
     {
         super(r);
-        grid = null;
-        gp = new Rectangular();
     }
     
     /** 
@@ -88,8 +86,6 @@ public class AreaImpl extends DefaultArea implements Area
     public AreaImpl(Box box)
     {
         super(box);
-        grid = null;
-        gp = new Rectangular();
     }
     
     /** 
@@ -99,8 +95,6 @@ public class AreaImpl extends DefaultArea implements Area
     public AreaImpl(Vector<Box> boxList)
     {
         super(boxList);
-        grid = null;
-        gp = new Rectangular();
     }
     
     /** 
@@ -121,8 +115,6 @@ public class AreaImpl extends DefaultArea implements Area
         underlineSum = src.underlineSum;
         lineThroughCnt = src.lineThroughCnt;
         lineThroughSum = src.lineThroughSum;
-        grid = null;
-        gp = new Rectangular();
     }
     
     @Override
@@ -142,7 +134,7 @@ public class AreaImpl extends DefaultArea implements Area
     //@SuppressWarnings({ "rawtypes", "unchecked" })
     public void joinArea(AreaImpl other, Rectangular pos, boolean horizontal)
     {
-        gp = pos;
+        setGridPosition(pos);
         if (other.getChildCount() > 0)
         {
             Vector<GenericTreeNode> adopt = new Vector<GenericTreeNode>(other.getChildren());
@@ -662,9 +654,9 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasAbove(Separator sep)
     {
-        int gx1 = grid.findCellX(sep.getX1());
-        int gx2 = grid.findCellX(sep.getX2());
-        int gy = grid.findCellY(sep.getY1() - 1);
+        int gx1 = getGrid().findCellX(sep.getX1());
+        int gx2 = getGrid().findCellX(sep.getX2());
+        int gy = getGrid().findCellY(sep.getY1() - 1);
         int ret = 0;
         if (gx1 >= 0 && gx2 >= 0 && gy >= 0)
         {
@@ -690,9 +682,9 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasBelow(Separator sep)
     {
-        int gx1 = grid.findCellX(sep.getX1());
-        int gx2 = grid.findCellX(sep.getX2());
-        int gy = grid.findCellY(sep.getY2() + 1);
+        int gx1 = getGrid().findCellX(sep.getX1());
+        int gx2 = getGrid().findCellX(sep.getX2());
+        int gy = getGrid().findCellY(sep.getY2() + 1);
         int ret = 0;
         if (gx1 >= 0 && gx2 >= 0 && gy >= 0)
         {
@@ -718,9 +710,9 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasLeft(Separator sep)
     {
-        int gy1 = grid.findCellY(sep.getY1());
-        int gy2 = grid.findCellY(sep.getY2());
-        int gx = grid.findCellX(sep.getX1() - 1);
+        int gy1 = getGrid().findCellY(sep.getY1());
+        int gy2 = getGrid().findCellY(sep.getY2());
+        int gx = getGrid().findCellX(sep.getX1() - 1);
         int ret = 0;
         if (gy1 >= 0 && gy2 >= 0 && gx >= 0)
         {
@@ -745,9 +737,9 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasRight(Separator sep)
     {
-        int gy1 = grid.findCellY(sep.getY1());
-        int gy2 = grid.findCellY(sep.getY2());
-        int gx = grid.findCellX(sep.getX2() + 1);
+        int gy1 = getGrid().findCellY(sep.getY1());
+        int gy2 = getGrid().findCellY(sep.getY2());
+        int gx = getGrid().findCellX(sep.getX2() + 1);
         int ret = 0;
         if (gy1 >= 0 && gy2 >= 0 && gx >= 0)
         {
