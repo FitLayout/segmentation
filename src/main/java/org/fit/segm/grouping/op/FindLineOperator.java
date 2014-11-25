@@ -86,7 +86,7 @@ public class FindLineOperator implements AreaTreeOperator
                     //try to find some node at the right in the given distance
                     for (int y = ny1; neigh == null && y <= ny2; y++)
                     {
-                        neigh = a.getGrid().getAreaAt(nx2 + dist, y);
+                        neigh = (AreaImpl) a.getGrid().getAreaAt(nx2 + dist, y);
                         if (neigh != null) //something found
                         {
                             if (useConsistentStyle || node.hasSameStyle(neigh))
@@ -203,7 +203,7 @@ public class FindLineOperator implements AreaTreeOperator
     {
         for (int x = node.getGridX(); x < node.getGridX() + node.getGridWidth(); x++)
         {
-            AreaImpl cand = parent.getGrid().getAreaAt(x, y);
+            AreaImpl cand = (AreaImpl) parent.getGrid().getAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }

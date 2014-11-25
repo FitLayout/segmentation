@@ -7,7 +7,7 @@ package org.fit.segm.grouping.op;
 
 import java.util.Vector;
 
-import org.fit.segm.grouping.AreaGrid;
+import org.fit.layout.impl.AreaGrid;
 import org.fit.segm.grouping.AreaImpl;
 
 /**

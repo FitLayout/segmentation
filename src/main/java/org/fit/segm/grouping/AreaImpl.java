@@ -28,30 +28,14 @@ import org.fit.segm.grouping.op.SeparatorSet;
  */
 public class AreaImpl extends DefaultArea implements Area
 {
-    /** A grid of inserted elements */
-    protected AreaGrid grid;
-    
     /** Set of separators */
     private SeparatorSet seps;
-    
-    /** Position of this area in the parent grid */
-    protected Rectangular gp;
     
     /**
      * Area level. 0 corresponds to the areas formed by boxes, greater numbers represent
      * greater level of grouping
      */
     private int level = 0;
-    
-    /**
-     * Previous area on the same line
-     */
-    private AreaImpl previousOnLine = null;
-    
-    /** 
-     * Next area on the same line
-     */
-    private AreaImpl nextOnLine = null;
     
     /**
      * Explicitly separated area
@@ -76,8 +60,6 @@ public class AreaImpl extends DefaultArea implements Area
     private int underlineCnt = 0;
     private float lineThroughSum = 0;
     private int lineThroughCnt = 0;
-    
-    //TODO create some grid topology
     
 	//================================================================================
 	
@@ -243,26 +225,6 @@ public class AreaImpl extends DefaultArea implements Area
 		this.level = level;
 	}
 
-    public AreaImpl getPreviousOnLine()
-    {
-        return previousOnLine;
-    }
-
-    public void setPreviousOnLine(AreaImpl previousOnLine)
-    {
-        this.previousOnLine = previousOnLine;
-    }
-
-    public AreaImpl getNextOnLine()
-    {
-        return nextOnLine;
-    }
-
-    public void setNextOnLine(AreaImpl nextOnLine)
-    {
-        this.nextOnLine = nextOnLine;
-    }
-    
 	public String toString()
     {
         String bs = "";
@@ -612,107 +574,6 @@ public class AreaImpl extends DefaultArea implements Area
         return ret;
     }
     
-    //====================================================================================
-    // grid operations
-    //====================================================================================
-    
-    /**
-     * Creates the grid of areas from the child areas.
-     */
-    public void createGrid()
-    {
-        grid = new AreaGrid(this);
-    }
-    
-    /**
-     * Obtains the gird of contained areas.
-     * @return the grid
-     */
-    public AreaGrid getGrid()
-    {
-        return grid;
-    }
-    
-    /**
-     * @return Returns the height of the area in the grid height in rows
-     */
-    public int getGridHeight()
-    {
-        return gp.getHeight();
-    }
-
-    /**
-     * @return Returns the width of the area in the grid in rows
-     */
-    public int getGridWidth()
-    {
-        return gp.getWidth();
-    }
-
-    /**
-     * @return Returns the gridX.
-     */
-    public int getGridX()
-    {
-        return gp.getX1();
-    }
-
-    /**
-     * @param gridX The gridX to set.
-     */
-    public void setGridX(int gridX)
-    {
-        gp.setX1(gridX);
-    }
-
-    /**
-     * @return Returns the gridY.
-     */
-    public int getGridY()
-    {
-        return gp.getY1();
-    }
-
-    /**
-     * @param gridY The gridY to set.
-     */
-    public void setGridY(int gridY)
-    {
-        gp.setY1(gridY);
-    }
-    
-    /**
-     * @return the position of this area in the grid of its parent area
-     */
-    public Rectangular getGridPosition()
-    {
-        return gp;
-    }
-    
-    /**
-     * Sets the position in the parent area grid for this area
-     * @param pos the position
-     */
-    public void setGridPosition(Rectangular pos)
-    {
-        gp = new Rectangular(pos);
-    }
-    
-    /**
-     * Returns the child area at the specified grid position or null, if there is no
-     * child area at this position.
-     */
-    public AreaImpl getChildAtGridPos(int x, int y)
-    {
-        for (GenericTreeNode child : getChildren())
-        {
-            AreaImpl childarea = (AreaImpl) child;
-            if (childarea.getGridPosition().contains(x, y))
-                return childarea;
-        }
-        return null;
-    }
-    
     /**
      * Returns the child areas whose absolute coordinates intersect with the specified rectangle.
      */
@@ -810,7 +671,7 @@ public class AreaImpl extends DefaultArea implements Area
             int i = gx1;
             while (i <= gx2)
             {
-                AreaImpl node = grid.getAreaAt(i, gy);
+                AreaImpl node = (AreaImpl) getGrid().getAreaAt(i, gy);
                 //System.out.println("Search: " + i + ":" + gy + " = " + node);
                 if (node != null)
                 {
@@ -838,7 +699,7 @@ public class AreaImpl extends DefaultArea implements Area
             int i = gx1;
             while (i <= gx2)
             {
-                AreaImpl node = grid.getAreaAt(i, gy);
+                AreaImpl node = (AreaImpl) getGrid().getAreaAt(i, gy);
                 //System.out.println("Search: " + i + ":" + gy + " = " + node);
                 if (node != null)
                 {
@@ -866,7 +727,7 @@ public class AreaImpl extends DefaultArea implements Area
             int i = gy1;
             while (i <= gy2)
             {
-                AreaImpl node = grid.getAreaAt(gx, i);
+                AreaImpl node = (AreaImpl) getGrid().getAreaAt(gx, i);
                 if (node != null)
                 {
                     ret++;
@@ -893,7 +754,7 @@ public class AreaImpl extends DefaultArea implements Area
             int i = gy1;
             while (i <= gy2)
             {
-                AreaImpl node = grid.getAreaAt(gx, i);
+                AreaImpl node = (AreaImpl) getGrid().getAreaAt(gx, i);
                 if (node != null)
                 {
                     ret++;
