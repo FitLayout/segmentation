@@ -45,21 +45,21 @@ public class AreaImpl extends DefaultArea implements Area
     /**
      * Sum for computing the average font size
      */
-    private int fontSizeSum = 0;
+    private float fontSizeSum;
     
     /**
      * Counter for computing the average font size
      */
-    private float fontSizeCnt = 0;
+    private int fontSizeCnt;
     
-    private float fontWeightSum = 0;
-    private int fontWeightCnt = 0;
-    private float fontStyleSum = 0;
-    private int fontStyleCnt = 0;
-    private float underlineSum = 0;
-    private int underlineCnt = 0;
-    private float lineThroughSum = 0;
-    private int lineThroughCnt = 0;
+    private float fontWeightSum;
+    private int fontWeightCnt;
+    private float fontStyleSum;
+    private int fontStyleCnt;
+    private float underlineSum;
+    private int underlineCnt;
+    private float lineThroughSum;
+    private int lineThroughCnt;
     
 	//================================================================================
 	
