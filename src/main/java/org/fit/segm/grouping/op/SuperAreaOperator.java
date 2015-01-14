@@ -24,6 +24,14 @@ public class SuperAreaOperator implements AreaTreeOperator
     protected int depthLimit;
 
     /**
+     * Creates the deparator with default parameter values.
+     */
+    public SuperAreaOperator()
+    {
+        depthLimit = 2;
+    }
+    
+    /**
      * Creates the operator.
      * @param depthLimit Recursion depth limit while detecting the sub-areas
      */

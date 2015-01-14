@@ -25,6 +25,12 @@ public class FindLineOperator implements AreaTreeOperator
     protected float maxLineEmSpace;
     
     
+    public FindLineOperator()
+    {
+        useConsistentStyle = false;
+        maxLineEmSpace = 1.5f;
+    }
+    
     public FindLineOperator(boolean useConsistentStyle, float maxLineEmSpace)
     {
         this.useConsistentStyle = useConsistentStyle;
