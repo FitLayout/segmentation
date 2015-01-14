@@ -41,6 +41,12 @@ public class SuperAreaOperator implements AreaTreeOperator
     }
     
     @Override
+    public String getId()
+    {
+        return "FitLayout.Segm.SuperAreas";
+    }
+    
+    @Override
     public String getName()
     {
         return "Super areas";

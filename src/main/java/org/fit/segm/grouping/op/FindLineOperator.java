@@ -38,6 +38,12 @@ public class FindLineOperator implements AreaTreeOperator
     }
     
     @Override
+    public String getId()
+    {
+        return "FitLayout.Segm.FindLines";
+    }
+    
+    @Override
     public String getName()
     {
         return "Find lines";

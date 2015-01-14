@@ -22,6 +22,12 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     }
     
     @Override
+    public String getId()
+    {
+        return "FitLayout.Segm.HomogeneousLeaves";
+    }
+    
+    @Override
     public String getName()
     {
         return "Homogeneous leafs";
