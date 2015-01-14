@@ -11,7 +11,7 @@
 	<name>LayoutSegm</name>
 	
 	<build>
-		<sourceDirectory>src</sourceDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
 		
 		<plugins>
 			<plugin>
