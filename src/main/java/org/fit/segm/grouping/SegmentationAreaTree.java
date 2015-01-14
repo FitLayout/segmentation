@@ -9,11 +9,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.DisplayType;
 import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.Page;
-import org.fit.layout.model.SearchableAreaContainer;
 import org.fit.layout.model.Tag;
 
 
@@ -22,7 +22,7 @@ import org.fit.layout.model.Tag;
  * 
  * @author burgetr
  */
-public class AreaTree implements SearchableAreaContainer
+public class SegmentationAreaTree implements AreaTree
 {
     /** The source tree */
     protected Page boxtree;
@@ -36,7 +36,7 @@ public class AreaTree implements SearchableAreaContainer
      * Create a new tree of areas by the analysis of a box tree
      * @param srctree the source box tree
      */
-    public AreaTree(Page srctree)
+    public SegmentationAreaTree(Page srctree)
     {
         boxtree = srctree;
         rootarea = new AreaImpl(0, 0, 0, 0);

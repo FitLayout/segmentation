@@ -5,8 +5,9 @@
  */
 package org.fit.segm.grouping.op;
 
+import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
-import org.fit.segm.grouping.AreaTree;
 
 /**
  * This operator joins the homogeneous-style leaf nodes to larger artificial areas. 
@@ -21,15 +22,27 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     }
     
     @Override
+    public String getName()
+    {
+        return "Homogeneous leafs";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "..."; //TODO
+    }
+    
+    @Override
     public void apply(AreaTree atree)
     {
         findHomogeneousLeaves((AreaImpl) atree.getRoot());
     }
 
     @Override
-    public void apply(AreaTree atree, AreaImpl root)
+    public void apply(AreaTree atree, Area root)
     {
-        findHomogeneousLeaves(root);
+        findHomogeneousLeaves((AreaImpl) root);
     }
 
     //==============================================================================

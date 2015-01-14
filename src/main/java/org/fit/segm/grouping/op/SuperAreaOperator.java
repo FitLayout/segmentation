@@ -7,9 +7,10 @@ package org.fit.segm.grouping.op;
 
 import java.util.Vector;
 
+import org.fit.layout.api.AreaTreeOperator;
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
-import org.fit.segm.grouping.AreaTree;
 import org.fit.segm.grouping.Config;
 
 /**
@@ -32,15 +33,27 @@ public class SuperAreaOperator implements AreaTreeOperator
     }
     
     @Override
+    public String getName()
+    {
+        return "Super areas";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "..."; //TODO
+    }
+
+    @Override
     public void apply(AreaTree atree)
     {
         recursiveFindSuperAreas((AreaImpl) atree.getRoot());
     }
 
     @Override
-    public void apply(AreaTree atree, AreaImpl root)
+    public void apply(AreaTree atree, Area root)
     {
-        recursiveFindSuperAreas(root);
+        recursiveFindSuperAreas((AreaImpl) root);
     }
 
     //==============================================================================

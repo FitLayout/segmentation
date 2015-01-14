@@ -5,9 +5,11 @@
  */
 package org.fit.segm.grouping.op;
 
+import org.fit.layout.api.AreaTreeOperator;
+import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
-import org.fit.segm.grouping.AreaTree;
 
 /**
  * Detects the basic lines in the area tree and joins the appropriate areas so that a line
@@ -29,6 +31,18 @@ public class FindLineOperator implements AreaTreeOperator
         this.maxLineEmSpace = maxLineEmSpace;
     }
     
+    @Override
+    public String getName()
+    {
+        return "Find lines";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "..."; //TODO
+    }
+
     //==============================================================================
 
     @Override
@@ -38,9 +52,9 @@ public class FindLineOperator implements AreaTreeOperator
     }
 
     @Override
-    public void apply(AreaTree atree, AreaImpl root)
+    public void apply(AreaTree atree, Area root)
     {
-        recursiveJoinAreas(root);
+        recursiveJoinAreas((AreaImpl) root);
     }
     
     //==============================================================================
