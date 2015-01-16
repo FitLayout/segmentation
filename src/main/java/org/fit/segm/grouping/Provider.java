@@ -38,7 +38,9 @@ public class Provider implements AreaTreeProvider
     @Override
     public AreaTree createAreaTree(Page page)
     {
-        return new SegmentationAreaTree(page);
+        SegmentationAreaTree atree = new SegmentationAreaTree(page);
+        atree.findBasicAreas();
+        return atree; 
     }
 
 }
