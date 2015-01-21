@@ -16,6 +16,9 @@ import org.fit.segm.grouping.AreaImpl;
  */
 public class HomogeneousLeafOperator extends SuperAreaOperator
 {
+    protected final String[] paramNames = {};
+    protected final ValueType[] paramTypes = {};
+    
     public HomogeneousLeafOperator()
     {
         super(10);

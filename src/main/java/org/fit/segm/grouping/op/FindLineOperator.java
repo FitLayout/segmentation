@@ -5,7 +5,6 @@
  */
 package org.fit.segm.grouping.op;
 
-import org.fit.layout.api.AreaTreeOperator;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
@@ -16,13 +15,16 @@ import org.fit.segm.grouping.AreaImpl;
  * is the smallest visual area. 
  * @author burgetr
  */
-public class FindLineOperator implements AreaTreeOperator
+public class FindLineOperator extends BaseOperator
 {
     /** Should the lines have a consistent visual style? */
     protected boolean useConsistentStyle;
     
     /** The maximal distance of two areas allowed within a single line (in 'em' units) */
     protected float maxLineEmSpace;
+    
+    protected final String[] paramNames = { "useConsistentStyle", "maxLineEmSpace" };
+    protected final ValueType[] paramTypes = { ValueType.BOOLEAN, ValueType.STRING };
     
     
     public FindLineOperator()
@@ -53,6 +55,38 @@ public class FindLineOperator implements AreaTreeOperator
     public String getDescription()
     {
         return "..."; //TODO
+    }
+
+    @Override
+    public String[] getParamNames()
+    {
+        return paramNames;
+    }
+
+    @Override
+    public ValueType[] getParamTypes()
+    {
+        return paramTypes;
+    }
+
+    public boolean getUseConsistentStyle()
+    {
+        return useConsistentStyle;
+    }
+
+    public void setUseConsistentStyle(boolean useConsistentStyle)
+    {
+        this.useConsistentStyle = useConsistentStyle;
+    }
+
+    public float getMaxLineEmSpace()
+    {
+        return maxLineEmSpace;
+    }
+
+    public void setMaxLineEmSpace(float maxLineEmSpace)
+    {
+        this.maxLineEmSpace = maxLineEmSpace;
     }
 
     //==============================================================================

@@ -7,7 +7,6 @@ package org.fit.segm.grouping.op;
 
 import java.util.Vector;
 
-import org.fit.layout.api.AreaTreeOperator;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
@@ -18,11 +17,14 @@ import org.fit.segm.grouping.Config;
  * 
  * @author burgetr
  */
-public class SuperAreaOperator implements AreaTreeOperator
+public class SuperAreaOperator extends BaseOperator
 {
     /** Recursion depth limit while detecting the sub-areas */
     protected int depthLimit;
 
+    protected final String[] paramNames = { "depthLimit" };
+    protected final ValueType[] paramTypes = { ValueType.INTEGER };
+    
     /**
      * Creates the deparator with default parameter values.
      */
@@ -58,6 +60,30 @@ public class SuperAreaOperator implements AreaTreeOperator
         return "..."; //TODO
     }
 
+    @Override
+    public String[] getParamNames()
+    {
+        return paramNames;
+    }
+
+    @Override
+    public ValueType[] getParamTypes()
+    {
+        return paramTypes;
+    }
+    
+    public int getDepthLimit()
+    {
+        return depthLimit;
+    }
+
+    public void setDepthLimit(int depthLimit)
+    {
+        this.depthLimit = depthLimit;
+    }
+
+    //==============================================================================
+    
     @Override
     public void apply(AreaTree atree)
     {
