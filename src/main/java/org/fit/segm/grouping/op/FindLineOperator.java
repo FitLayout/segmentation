@@ -5,6 +5,7 @@
  */
 package org.fit.segm.grouping.op;
 
+import org.fit.layout.impl.BaseOperator;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
