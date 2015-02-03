@@ -25,7 +25,7 @@ import org.fit.layout.model.Tag;
 public class SegmentationAreaTree implements AreaTree
 {
     /** The source tree */
-    protected Page boxtree;
+    protected Page page;
     
     /** The root node area */
     protected AreaImpl rootarea;
@@ -34,12 +34,13 @@ public class SegmentationAreaTree implements AreaTree
     
     /**
      * Create a new tree of areas by the analysis of a box tree
-     * @param srctree the source box tree
+     * @param srcpage the source box tree
      */
-    public SegmentationAreaTree(Page srctree)
+    public SegmentationAreaTree(Page srcpage)
     {
-        boxtree = srctree;
+        page = srcpage;
         rootarea = new AreaImpl(0, 0, 0, 0);
+        rootarea.setPage(srcpage);
     }
     
     /**
@@ -57,13 +58,14 @@ public class SegmentationAreaTree implements AreaTree
     public Area findBasicAreas()
     {
         rootarea = new AreaImpl(0, 0, 0, 0);
-        for (int i = 0; i < boxtree.getRoot().getChildCount(); i++)
+        rootarea.setPage(page);
+        for (int i = 0; i < page.getRoot().getChildCount(); i++)
         {
             Area sub;
-            sub = new AreaImpl(boxtree.getRoot().getChildBox(i));
+            sub = new AreaImpl(page.getRoot().getChildBox(i));
             if (sub.getWidth() > 1 || sub.getHeight() > 1)
             {
-                findStandaloneAreas(boxtree.getRoot().getChildBox(i), sub);
+                findStandaloneAreas(page.getRoot().getChildBox(i), sub);
                 rootarea.appendChild(sub);
             }
         }
