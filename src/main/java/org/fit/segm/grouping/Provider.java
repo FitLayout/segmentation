@@ -5,7 +5,7 @@
  */
 package org.fit.segm.grouping;
 
-import org.fit.layout.api.AreaTreeProvider;
+import org.fit.layout.impl.BaseAreaTreeProvider;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Page;
 
@@ -14,7 +14,7 @@ import org.fit.layout.model.Page;
  * 
  * @author burgetr
  */
-public class Provider implements AreaTreeProvider
+public class Provider extends BaseAreaTreeProvider
 {
 
     @Override
@@ -41,6 +41,18 @@ public class Provider implements AreaTreeProvider
         SegmentationAreaTree atree = new SegmentationAreaTree(page);
         atree.findBasicAreas();
         return atree; 
+    }
+
+    @Override
+    public String[] getParamNames()
+    {
+        return new String[0];
+    }
+
+    @Override
+    public ValueType[] getParamTypes()
+    {
+        return new ValueType[0];
     }
 
 }
