@@ -25,7 +25,7 @@ public class FindLineOperator extends BaseOperator
     protected float maxLineEmSpace;
     
     protected final String[] paramNames = { "useConsistentStyle", "maxLineEmSpace" };
-    protected final ValueType[] paramTypes = { ValueType.BOOLEAN, ValueType.STRING };
+    protected final ValueType[] paramTypes = { ValueType.BOOLEAN, ValueType.FLOAT };
     
     
     public FindLineOperator()
