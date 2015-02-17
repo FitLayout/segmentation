@@ -38,7 +38,7 @@ public class SegmentatorPlugin implements BrowserPlugin, AreaSelectionListener
     private JList<Separator> sepList;
     private JToolBar showToolBar;
     private JButton showSepButton;
-    
+    private JButton gridButton = null;
     
     @Override
     public boolean init(Browser browser)
@@ -152,9 +152,9 @@ public class SegmentatorPlugin implements BrowserPlugin, AreaSelectionListener
     {
         if (showToolBar == null)
         {
-            showToolBar = new JToolBar();
+            showToolBar = new JToolBar("Segmentation");
             showToolBar.add(getShowSepButton());
-            //showToolBar.add(getGridButton());
+            showToolBar.add(getGridButton());
         }
         return showToolBar;
     }
@@ -174,6 +174,33 @@ public class SegmentatorPlugin implements BrowserPlugin, AreaSelectionListener
             });
         }
         return showSepButton;
+    }
+
+    /**
+     * This method initializes gridButton   
+     *  
+     * @return javax.swing.JButton  
+     */
+    private JButton getGridButton()
+    {
+        if (gridButton == null)
+        {
+            gridButton = new JButton();
+            gridButton.setText("Show grid");
+            gridButton.addActionListener(new java.awt.event.ActionListener()
+            {
+                public void actionPerformed(java.awt.event.ActionEvent e)
+                {
+                    Area node = browser.getSelectedArea();
+                    if (node != null)
+                    {
+                        node.getTopology().drawLayout(browser.getOutputDisplay());
+                        browser.updateDisplay();
+                    }
+                }
+            });
+        }
+        return gridButton;
     }
 
 
