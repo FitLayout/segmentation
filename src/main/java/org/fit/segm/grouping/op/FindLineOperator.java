@@ -150,7 +150,7 @@ public class FindLineOperator extends BaseOperator
                         neigh = (AreaImpl) a.getGrid().getAreaAt(nx2 + dist, y);
                         if (neigh != null) //something found
                         {
-                            if (useConsistentStyle || node.hasSameStyle(neigh))
+                            if (!useConsistentStyle || node.hasSameStyle(neigh))
                             {
                                 if (horizontalJoin(a, node, neigh, true)) //try to join
                                 {
