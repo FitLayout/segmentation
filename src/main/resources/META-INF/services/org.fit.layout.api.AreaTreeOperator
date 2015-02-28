@@ -1,3 +1,4 @@
 org.fit.segm.grouping.op.FindLineOperator
+org.fit.segm.grouping.op.MultiLineOperator
 org.fit.segm.grouping.op.HomogeneousLeafOperator
 org.fit.segm.grouping.op.SuperAreaOperator

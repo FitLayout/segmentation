@@ -1,0 +1,266 @@
+/**
+ * MultiLineOperator.java
+ *
+ * Created on 28. 2. 2015, 23:10:59 by burgetr
+ */
+package org.fit.segm.grouping.op;
+
+import org.fit.layout.impl.BaseOperator;
+import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTree;
+import org.fit.layout.model.Rectangular;
+import org.fit.segm.grouping.AreaImpl;
+
+/**
+ * Detects sequences of aligned lines and joins them to a single area.
+ * 
+ * @author burgetr
+ */
+public class MultiLineOperator extends BaseOperator
+{
+    /** Should the lines have a consistent visual style? */
+    protected boolean useConsistentStyle;
+    
+    /** The maximal distance of two areas allowed within a single line (in 'em' units) */
+    protected float maxLineEmSpace;
+    
+    protected final String[] paramNames = { "useConsistentStyle", "maxLineEmSpace" };
+    protected final ValueType[] paramTypes = { ValueType.BOOLEAN, ValueType.FLOAT };
+    
+    
+    public MultiLineOperator()
+    {
+        useConsistentStyle = false;
+        maxLineEmSpace = 1.5f;
+    }
+    
+    public MultiLineOperator(boolean useConsistentStyle, float maxLineEmSpace)
+    {
+        this.useConsistentStyle = useConsistentStyle;
+        this.maxLineEmSpace = maxLineEmSpace;
+    }
+    
+    @Override
+    public String getId()
+    {
+        return "FitLayout.Segm.MultiLine";
+    }
+    
+    @Override
+    public String getName()
+    {
+        return "Group aligned lines";
+    }
+
+    @Override
+    public String getDescription()
+    {
+        return "..."; //TODO
+    }
+
+    @Override
+    public String[] getParamNames()
+    {
+        return paramNames;
+    }
+
+    @Override
+    public ValueType[] getParamTypes()
+    {
+        return paramTypes;
+    }
+
+    public boolean getUseConsistentStyle()
+    {
+        return useConsistentStyle;
+    }
+
+    public void setUseConsistentStyle(boolean useConsistentStyle)
+    {
+        this.useConsistentStyle = useConsistentStyle;
+    }
+
+    public float getMaxLineEmSpace()
+    {
+        return maxLineEmSpace;
+    }
+
+    public void setMaxLineEmSpace(float maxLineEmSpace)
+    {
+        this.maxLineEmSpace = maxLineEmSpace;
+    }
+
+    //==============================================================================
+
+    @Override
+    public void apply(AreaTree atree)
+    {
+        recursiveJoinAreas((AreaImpl) atree.getRoot());
+    }
+
+    @Override
+    public void apply(AreaTree atree, Area root)
+    {
+        recursiveJoinAreas((AreaImpl) root);
+    }
+    
+    //==============================================================================
+    
+    
+    /**
+     * Goes through all the areas in the tree and tries to join their sub-areas into single
+     * areas.
+     */
+    protected void recursiveJoinAreas(AreaImpl root)
+    {
+        joinAreas(root);
+        for (int i = 0; i < root.getChildCount(); i++)
+            recursiveJoinAreas((AreaImpl) root.getChildArea(i));
+    }
+    
+    /**
+     * Goes through the grid of areas and joins the adjacent visual areas that are not
+     * separated by anything
+     */
+    protected void joinAreas(AreaImpl a)
+    {
+        if (a.getGrid() == null) //a gird is necessary for this
+            a.createGrid();
+        
+        boolean change = true;
+        while (change)
+        {
+            change = false;
+            for (int i = 0; i < a.getChildCount(); i++)
+            {
+                final AreaImpl node = (AreaImpl) a.getChildArea(i);
+                final int nx1 = node.getGridPosition().getX1();
+                final int nx2 = node.getGridPosition().getX2();
+                final int ny2 = node.getGridPosition().getY2();
+                
+                //try to expand down - find a neighbor
+                AreaImpl neigh = null;
+                int dist = 1;
+                while (neigh == null && ny2 + dist < a.getGrid().getHeight())
+                {
+                    //try to find some node below in the given distance
+                    for (int x = nx1; neigh == null && x <= nx2; x++)
+                    {
+                        neigh = (AreaImpl) a.getGrid().getAreaAt(x, ny2 + dist);
+                        if (neigh != null) //something found
+                        {
+                            if ((!useConsistentStyle || node.hasSameStyle(neigh))
+                                    && neigh.getGridPosition().getX1() == nx1)
+                            {
+                                if (verticalJoin(a, node, neigh, true)) //try to join
+                                {
+                                    node.createGrid();
+                                    change = true;
+                                }
+                            }
+                        }
+                    }
+                    dist++;
+                }
+                if (change) break; //something changed, repeat
+            }
+        }
+    }
+
+    /**
+     * Joins two boxes vertically into one area if the node widths are equal or they 
+     * can be aligned to a rectangle using free spaces.
+     * @param n1 left node to be aligned
+     * @param n2 right node to be aligned
+     * @param affect when set to <code>true</code>, the two nodes are joined and n2 is removed from the tree.
+     *        When set to <code>false</code>, no changes are performed (only checking)
+     * @return <code>true</code> when succeeded
+     */
+    private boolean verticalJoin(AreaImpl parent, AreaImpl n1, AreaImpl n2, boolean affect)
+    {
+        //System.out.println("VJoin: " + n1.toString() + " + " + n2.toString());
+        //check the maximal distance between the nodes
+        int dist = Math.min(Math.abs(n2.getY1() - n1.getY2()), Math.abs(n1.getY1() - n2.getY2()));
+        if (dist > n1.getFontSize() * maxLineEmSpace)
+            return false;
+        //check if there is no separating border or background
+        if (n1.hasBottomBorder() || 
+            n2.hasTopBorder() ||
+            !n1.hasSameBackground(n2))
+            return false; //separated, give up
+        //align the start
+        int sx1 = n1.getGridPosition().getX1();
+        int sx2 = n2.getGridPosition().getX1();
+        while (sx1 != sx2)
+        {
+            if (sx1 < sx2) //n1 starts earlier, try to expand n2 to the left
+            {
+                if (sx2 > 0 && canExpandX(parent, n2, sx2-1, n1))
+                    sx2--;
+                else
+                    return false; //cannot align - give up
+            }
+            else if (sx1 > sx2) //n2 starts earlier, try to expand n1 to the left
+            {
+                if (sx1 > 0 && canExpandX(parent, n1, sx1-1, n2))
+                    sx1--;
+                else
+                    return false; //cannot align - give up
+            }
+        }
+        //System.out.println("sy1="+sy1);
+        //align the end
+        int ex1 = n1.getGridPosition().getX2(); //last
+        int ex2 = n2.getGridPosition().getX2();
+        while (ex1 != ex2)
+        {
+            if (ex1 < ex2) //n1 ends earlier, try to expand n1 to the right
+            {
+                if (ex1 < parent.getGrid().getHeight()-1 && canExpandX(parent, n1, ex1+1, n2))
+                    ex1++;
+                else
+                    return false; //cannot align - give up
+            }
+            else if (ex1 > ex2) //n2 ends earlier, try to expand n2 to the right
+            {
+                if (ex2 < parent.getGrid().getHeight()-1 && canExpandX(parent, n2, ex2+1, n1))
+                    ex2++;
+                else
+                    return false; //cannot align - give up
+            }
+        }
+        //System.out.println("ey1="+ey1);
+        //align succeeded, join the areas
+        if (affect)
+        {
+            System.out.println("VJoin: " + n1 + " + " + n2);
+            Rectangular newpos = new Rectangular(sx1, n1.getGridPosition().getY1(),
+                                                 ex1, n2.getGridPosition().getY2());
+            n1.joinArea(n2, newpos, true);
+            parent.removeChild(n2);
+        }
+        return true;
+    }
+    
+    
+    /**
+     * Checks if the area can be horizontally expanded to the given 
+     * X coordinate, i.e. there is a free space in the space on this X coordinate
+     * for the whole width of the area.
+     * @param node the area node that should be expanded
+     * @param x the X coordinate to that the area should be expanded
+     * @param except an area that shouldn't be considered for conflicts (e.g. an overlaping area)
+     * @return <code>true</code> if the area can be expanded
+     */
+    private boolean canExpandX(AreaImpl parent, AreaImpl node, int x, AreaImpl except)
+    {
+        for (int y = node.getGridY(); y < node.getGridY() + node.getGridHeight(); y++)
+        {
+            AreaImpl cand = (AreaImpl) parent.getGrid().getAreaAt(x, y);
+            if (cand != null && cand != except)
+                return false; //something found - cannot expand
+        }
+        return true;
+    }
+
+}
