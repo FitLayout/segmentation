@@ -33,7 +33,7 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
     @Override
     public String getName()
     {
-        return "Homogeneous leafs";
+        return "Homogeneous leaves";
     }
 
     @Override
