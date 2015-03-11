@@ -37,9 +37,9 @@ public class GroupAnalyzer
      * of the areas inside. The subareas are not automatically added to the
      * new area because this would cause their removal from the parent area.
      * @param sub the subnode to start with
-     * @param a vector that will be filled with the selected subnodes 
+     * @param selected a vector that will be filled with the selected subnodes 
      * that should be contained in the new area
-     * @return the new empty
+     * @return the new empty area
      */
     public AreaImpl findSuperArea(AreaImpl sub, Vector<AreaImpl> selected)
     {
