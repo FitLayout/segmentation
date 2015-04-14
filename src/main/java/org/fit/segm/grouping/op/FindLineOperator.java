@@ -10,6 +10,8 @@ import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Detects the basic lines in the area tree and joins the appropriate areas so that a line
@@ -18,6 +20,8 @@ import org.fit.segm.grouping.AreaImpl;
  */
 public class FindLineOperator extends BaseOperator
 {
+    private static Logger log = LoggerFactory.getLogger(FindLineOperator.class);
+    
     /** Should the lines have a consistent visual style? */
     protected boolean useConsistentStyle;
     
@@ -241,7 +245,7 @@ public class FindLineOperator extends BaseOperator
         //align succeeded, join the areas
         if (affect)
         {
-            System.out.println("Join: " + n1 + " + " + n2);
+            log.debug("Join: {} + {}", n1, n2);
             Rectangular newpos = new Rectangular(n1.getGridPosition().getX1(), sy1,
                                                  n2.getGridPosition().getX2(), ey1);
             n1.joinArea(n2, newpos, true);

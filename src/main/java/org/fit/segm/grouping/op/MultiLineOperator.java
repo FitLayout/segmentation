@@ -10,6 +10,8 @@ import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Detects sequences of aligned lines and joins them to a single area.
@@ -18,6 +20,8 @@ import org.fit.segm.grouping.AreaImpl;
  */
 public class MultiLineOperator extends BaseOperator
 {
+    private static Logger log = LoggerFactory.getLogger(MultiLineOperator.class);
+
     /** Should the lines have a consistent visual style? */
     protected boolean useConsistentStyle;
     
@@ -233,7 +237,7 @@ public class MultiLineOperator extends BaseOperator
         //align succeeded, join the areas
         if (affect)
         {
-            System.out.println("VJoin: " + n1 + " + " + n2);
+            log.debug("VJoin: {} + {}", n1, n2);
             Rectangular newpos = new Rectangular(sx1, n1.getGridPosition().getY1(),
                                                  ex1, n2.getGridPosition().getY2());
             n1.joinArea(n2, newpos, true);
