@@ -90,7 +90,7 @@ public class AreaImpl extends DefaultArea implements Area
     
     /** 
      * Creates an area from a a list of boxes. Update the area bounds and name accordingly.
-     * @param boxes The source boxes that will be contained in this area
+     * @param boxList The source boxes that will be contained in this area
      */
     public AreaImpl(Vector<Box> boxList)
     {
@@ -99,7 +99,7 @@ public class AreaImpl extends DefaultArea implements Area
     
     /** 
      * Creates a copy of another area.
-     * @param area The source area
+     * @param src The source area
      */
     public AreaImpl(AreaImpl src)
     {
@@ -444,9 +444,9 @@ public class AreaImpl extends DefaultArea implements Area
     }
     
     /**
-     * Returns the size height declared for the first box. If there are multiple boxes,
+     * Returns the font size declared for the first box. If there are multiple boxes,
      * the first one is used. If there are no boxes (an artificial area), 0 is returned.
-     * @return 
+     * @return the declared font size or 0 if there are no boxes
      */
     public float getDeclaredFontSize()
     {
