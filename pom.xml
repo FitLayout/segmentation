@@ -8,11 +8,12 @@
 	<parent>
 		<groupId>cz.vutbr.fit.layout</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.2-SNAPSHOT</version>
+		<version>0.0.2</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 	
 	<artifactId>layout-segmentation</artifactId>
+	<version>0.0.2-SNAPSHOT</version>
 	
 	<name>LayoutSegm</name>
 	<description>
@@ -52,7 +53,7 @@
 		<dependency>
 			<groupId>cz.vutbr.fit.layout</groupId>
 			<artifactId>layout-api</artifactId>
-			<version>${project.version}</version>
+			<version>0.0.2</version>
 		</dependency>
 	</dependencies>
 
