@@ -5,23 +5,25 @@
  */
 package org.fit.segm.grouping.op;
 
-import org.fit.layout.impl.BaseOperator;
+import java.util.List;
+import java.util.Vector;
+
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
-import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
 
 /**
  * 
  * @author burgetr
  */
-public class SortByLinesOperator extends BaseOperator
+public class SortByLinesOperator extends SortByPositionOperator
 {
     protected final String[] paramNames = { };
     protected final ValueType[] paramTypes = { };
     
     public SortByLinesOperator()
     {
+        super(false);
     }
     
     @Override
@@ -59,72 +61,88 @@ public class SortByLinesOperator extends BaseOperator
     @Override
     public void apply(AreaTree atree)
     {
-        recursiveJoinAreas((AreaImpl) atree.getRoot());
+        apply(atree, atree.getRoot());
     }
 
     @Override
     public void apply(AreaTree atree, Area root)
     {
-        recursiveJoinAreas((AreaImpl) root);
+        recursivelySortChildAreas(root, false);
+        recursiveSortLines((AreaImpl) root);
     }
     
     //==============================================================================
     
     /**
-     * Goes through all the areas in the tree and tries to join their sub-areas into single
-     * areas.
+     * Goes through all the areas in the tree and sorts their sub-areas.
      */
-    protected void recursiveJoinAreas(AreaImpl root)
+    protected void recursiveSortLines(AreaImpl root)
     {
-        joinAreas(root);
+        sortChildLines(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveJoinAreas((AreaImpl) root.getChildArea(i));
+            recursiveSortLines((AreaImpl) root.getChildArea(i));
     }
     
     /**
-     * Goes through the grid of areas and joins the adjacent visual areas that are not
+     * Goes through the grid of areas and sorts the adjacent visual areas that are not
      * separated by anything
      */
-    protected void joinAreas(AreaImpl a)
+    protected void sortChildLines(AreaImpl root)
     {
-        if (a.getGrid() == null) //a gird is necessary for this
-            a.createGrid();
+        if (root.getGrid() == null) //a gird is necessary for this
+            root.createGrid();
         
-        boolean change = true;
-        while (change)
+        List<Area> src = new Vector<Area>(root.getChildAreas());
+        List<Area> dest = new Vector<Area>(src.size());
+        while (!src.isEmpty())
         {
-            change = false;
-            for (int i = 0; i < a.getChildCount(); i++)
-            {
-                AreaImpl node = (AreaImpl) a.getChildArea(i);
-                int ny1 = node.getGridPosition().getY1();
-                int nx2 = node.getGridPosition().getX2();
-                int ny2 = node.getGridPosition().getY2();
-                
-                //try to expand to the right - find a neighbor
-                AreaImpl neigh = null;
-                int dist = 1;
-                while (neigh == null && nx2 + dist < a.getGrid().getWidth())
-                {
-                    //try to find some node at the right in the given distance
-                    for (int y = ny1; neigh == null && y <= ny2; y++)
-                    {
-                        neigh = (AreaImpl) a.getGrid().getAreaAt(nx2 + dist, y);
-                        if (neigh != null) //something found
-                        {
-                            if (isOnSameLine(a, node, neigh)) //check if the nodes could be joined
-                            {
-                                //TODO
-                            }
-                        }
-                    }
-                    dist++;
-                }
-                if (change) break; //something changed, repeat
-            }
+            final AreaImpl seed = (AreaImpl) src.get(0);
+            List<Area> line = findAreasOnLine(root, seed);
+            System.out.println("seed: " + seed);
+            System.out.println("   r: " + line);
+            dest.addAll(line);
+            src.removeAll(line);
         }
+        
+        root.removeAllChildren();
+        root.appendChildren(dest);
     }
 
+    private List<Area> findAreasOnLine(AreaImpl parent, AreaImpl area)
+    {
+        if (area.toString().contains("Bystrc"))
+            System.out.println("jo!");
+        Vector<Area> ret = new Vector<Area>();
+        ret.add(area);
+        
+        final int ny1 = area.getGridPosition().getY1();
+        final int nx2 = area.getGridPosition().getX2();
+        final int ny2 = area.getGridPosition().getY2();
+        
+        //try to expand to the right
+        int dist = 1;
+        while (nx2 + dist < parent.getGrid().getWidth())
+        {
+            //try to find some node at the right in the given distance
+            for (int y = ny1; y <= ny2; y++)
+            {
+                AreaImpl neigh = (AreaImpl) parent.getGrid().getAreaAt(nx2 + dist, y);
+                if (neigh != null) //something found
+                {
+                    if (isOnSameLine(parent, area, neigh)) //check if the nodes could be joined
+                    {
+                        ret.add(neigh);
+                    }
+                    else
+                        break;
+                }
+            }
+            dist++;
+        }
+            
+        return ret;
+    }
+    
     /**
      * Joins two boxes horizontally into one area if the node heights are equal or they 
      * can be aligned to a rectangle using free spaces.
