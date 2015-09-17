@@ -3,3 +3,4 @@ org.fit.segm.grouping.op.MultiLineOperator
 org.fit.segm.grouping.op.HomogeneousLeafOperator
 org.fit.segm.grouping.op.SuperAreaOperator
 org.fit.segm.grouping.op.SortByPositionOperator
+org.fit.segm.grouping.op.SortByLinesOperator
