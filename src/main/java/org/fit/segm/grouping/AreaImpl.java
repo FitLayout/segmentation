@@ -7,6 +7,7 @@ package org.fit.segm.grouping;
 
 import java.awt.Color;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 
@@ -124,6 +125,20 @@ public class AreaImpl extends DefaultArea implements Area
         updateAverages((AreaImpl) child);
     }
     
+    @Override
+    public void appendChildren(List<Area> list)
+    {
+        for (Area child : list)
+            appendChild(child);
+    }
+    
+    @Override
+    public void removeAllChildren()
+    {
+        super.removeAllChildren();
+        resetAverages();
+    }
+
     /**
      * Joins this area with another area and updates the layout in the grid to the given values.
      * Moves the children of the other areas to this area.
@@ -552,6 +567,20 @@ public class AreaImpl extends DefaultArea implements Area
         underlineSum += other.underlineSum;
         lineThroughCnt += other.lineThroughCnt;
         lineThroughSum += other.lineThroughSum;
+    }
+    
+    public void resetAverages()
+    {
+        fontSizeCnt = 0;
+        fontSizeSum = 0;
+        fontWeightCnt = 0;
+        fontWeightSum = 0;
+        fontStyleCnt = 0; 
+        fontStyleSum = 0; 
+        underlineCnt = 0; 
+        underlineSum = 0; 
+        lineThroughCnt = 0; 
+        lineThroughSum = 0; 
     }
     
     @Override
