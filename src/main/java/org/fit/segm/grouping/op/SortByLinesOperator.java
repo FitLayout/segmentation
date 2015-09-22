@@ -11,6 +11,7 @@ import java.util.Vector;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
+import org.fit.segm.grouping.AreaUtils;
 
 /**
  * 
@@ -97,7 +98,7 @@ public class SortByLinesOperator extends SortByPositionOperator
         while (!src.isEmpty())
         {
             final AreaImpl seed = (AreaImpl) src.get(0);
-            List<Area> line = findAreasOnLine(root, seed);
+            List<Area> line = findAreasOnLine(root, seed, src);
             System.out.println("seed: " + seed);
             System.out.println("   r: " + line);
             dest.addAll(line);
@@ -108,7 +109,7 @@ public class SortByLinesOperator extends SortByPositionOperator
         root.appendChildren(dest);
     }
 
-    private List<Area> findAreasOnLine(AreaImpl parent, AreaImpl area)
+    private List<Area> findAreasOnLine(AreaImpl parent, AreaImpl area, List<Area> candidates)
     {
         if (area.toString().contains("Bystrc"))
             System.out.println("jo!");
@@ -127,14 +128,14 @@ public class SortByLinesOperator extends SortByPositionOperator
             for (int y = ny1; y <= ny2; y++)
             {
                 AreaImpl neigh = (AreaImpl) parent.getGrid().getAreaAt(nx2 + dist, y);
-                if (neigh != null) //something found
+                if (neigh != null && candidates.contains(neigh)) //something found
                 {
-                    if (isOnSameLine(parent, area, neigh)) //check if the nodes could be joined
+                    //if (isOnSameLine(parent, area, neigh)) //check if the nodes could be joined
+                    if (AreaUtils.isOnSameLine(area, neigh, 2))
                     {
                         ret.add(neigh);
-                    }
-                    else
                         break;
+                    }
                 }
             }
             dist++;
