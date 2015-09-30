@@ -429,6 +429,7 @@ public class AreaImpl extends DefaultArea implements Area
      * </ul>
      * @return true if the area can be used as a horizontal separator
      */
+    @Override
     public boolean isHorizontalSeparator()
     {
         return !containsText() && 
@@ -441,21 +442,12 @@ public class AreaImpl extends DefaultArea implements Area
      * as for the horizontal one.
      * @return true if the area can be used as a vertical separator
      */
+    @Override
     public boolean isVerticalSeparator()
     {
         return !containsText() && 
                getBounds().getWidth() < 10 &&
                getBounds().getHeight() > 20 * getBounds().getWidth();
-    }
-    
-    /**
-     * Tries to guess if this area acts as any kind of separator.
-     * See the {@link #isVerticalSeparator()} and {@link #isHorizontalSeparator()} methods for more explanation.
-     * @return true if the area can be used as a separator
-     */
-    public boolean isSeparator()
-    {
-        return isHorizontalSeparator() || isVerticalSeparator();
     }
     
     /**
