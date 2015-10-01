@@ -92,27 +92,25 @@ public class SortByLinesOperator extends SortByPositionOperator
     {
         if (root.getGrid() == null) //a gird is necessary for this
             root.createGrid();
-        
-        List<Area> src = new Vector<Area>(root.getChildAreas());
-        List<Area> dest = new Vector<Area>(src.size());
-        while (!src.isEmpty())
+        if (root.getChildCount() > 1)
         {
-            final AreaImpl seed = (AreaImpl) src.get(0);
-            List<Area> line = findAreasOnLine(root, seed, src);
-            System.out.println("seed: " + seed);
-            System.out.println("   r: " + line);
-            dest.addAll(line);
-            src.removeAll(line);
+            List<Area> src = new Vector<Area>(root.getChildAreas());
+            List<Area> dest = new Vector<Area>(src.size());
+            while (!src.isEmpty())
+            {
+                final AreaImpl seed = (AreaImpl) src.get(0);
+                List<Area> line = findAreasOnLine(root, seed, src);
+                dest.addAll(line);
+                src.removeAll(line);
+            }
+            
+            root.removeAllChildren();
+            root.appendChildren(dest);
         }
-        
-        root.removeAllChildren();
-        root.appendChildren(dest);
     }
 
     private List<Area> findAreasOnLine(AreaImpl parent, AreaImpl area, List<Area> candidates)
     {
-        if (area.toString().contains("Bystrc"))
-            System.out.println("jo!");
         Vector<Area> ret = new Vector<Area>();
         ret.add(area);
         
@@ -124,7 +122,6 @@ public class SortByLinesOperator extends SortByPositionOperator
         //the maximal Y difference to consider other areas to be on the same line
         int threshold = (area.getHeight() / 2) - 1;
         if (threshold < 0) threshold = 0;
-        System.out.println("Thr:" + threshold);
         
         //try to expand to the right
         int dist = 1;
