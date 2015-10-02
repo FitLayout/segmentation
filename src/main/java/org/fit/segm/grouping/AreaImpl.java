@@ -217,7 +217,8 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public void joinChild(AreaImpl other)
     {
-        //TODO obsah se neimportuje?
+        for (Box box : other.getBoxes())
+            addBox(box);
         getBounds().expandToEnclose(other.getBounds());
         setName(getName() + " . " + other.getName());
     }
