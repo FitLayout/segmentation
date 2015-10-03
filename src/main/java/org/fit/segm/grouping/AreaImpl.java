@@ -562,7 +562,11 @@ public class AreaImpl extends DefaultArea implements Area
         lineThroughSum += other.lineThroughSum;
     }
     
-    public void resetAverages()
+    /**
+     * Resets the averages to the values obtained from the text boxes
+     * that belong to this area only. No subareas are considered.
+     */
+    protected void resetAverages()
     {
         fontSizeCnt = 0;
         fontSizeSum = 0;
@@ -573,7 +577,9 @@ public class AreaImpl extends DefaultArea implements Area
         underlineCnt = 0; 
         underlineSum = 0; 
         lineThroughCnt = 0; 
-        lineThroughSum = 0; 
+        lineThroughSum = 0;
+        for (Box box : getBoxes())
+            updateAveragesForBox(box);
     }
     
     @Override
@@ -845,17 +851,21 @@ public class AreaImpl extends DefaultArea implements Area
 	protected void addBox(Box box)
 	{
 		super.addBox(box);
-
+		updateAveragesForBox(box);
+	}
+	
+	private void updateAveragesForBox(Box box)
+	{
         if (box.getType() == Box.Type.TEXT_CONTENT)
         {
             int len = box.getText().trim().length();
             if (len > 0)
             {
-               	fontSizeSum += getAverageBoxFontSize(box) * len;
+                fontSizeSum += getAverageBoxFontSize(box) * len;
                 fontSizeCnt += len;
-               	fontWeightSum += getAverageBoxFontWeight(box) * len;
+                fontWeightSum += getAverageBoxFontWeight(box) * len;
                 fontWeightCnt += len;
-               	fontStyleSum += getAverageBoxFontStyle(box) * len;
+                fontStyleSum += getAverageBoxFontStyle(box) * len;
                 fontStyleCnt += len;
             }
         }

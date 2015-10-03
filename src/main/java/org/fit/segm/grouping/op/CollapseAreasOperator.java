@@ -75,7 +75,7 @@ public class CollapseAreasOperator extends BaseOperator
     {
         if (canCollapse(root))
         {
-            System.out.println("Collapsing: " + root);
+            //System.out.println("Collapsing: " + root);
             recursiveCollapseSubtree(root, root);
             root.removeAllChildren();
         }
