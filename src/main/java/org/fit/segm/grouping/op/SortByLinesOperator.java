@@ -119,10 +119,6 @@ public class SortByLinesOperator extends SortByPositionOperator
         final int nx2 = area.getGridPosition().getX2();
         final int ny2 = area.getGridPosition().getY2();
         
-        //the maximal Y difference to consider other areas to be on the same line
-        int threshold = (area.getHeight() / 2) - 1;
-        if (threshold < 0) threshold = 0;
-        
         //try to expand to the right
         int dist = 1;
         while (nx2 + dist < parent.getGrid().getWidth())
@@ -133,7 +129,10 @@ public class SortByLinesOperator extends SortByPositionOperator
                 AreaImpl neigh = (AreaImpl) parent.getGrid().getAreaAt(nx2 + dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
-                    //if (isOnSameLine(parent, area, neigh)) //check if the nodes could be joined
+                    //the maximal Y difference to consider other areas to be on the same line
+                    int threshold = (Math.min(area.getHeight(), neigh.getHeight()) / 2);
+                    if (threshold < 0) threshold = 0;
+                    //check if the nodes could be on the same line
                     if (AreaUtils.isOnSameLine(area, neigh, threshold))
                     {
                         ret.add(neigh);
@@ -153,7 +152,10 @@ public class SortByLinesOperator extends SortByPositionOperator
                 AreaImpl neigh = (AreaImpl) parent.getGrid().getAreaAt(nx1 - dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
-                    //if (isOnSameLine(parent, area, neigh)) //check if the nodes could be joined
+                    //the maximal Y difference to consider other areas to be on the same line
+                    int threshold = (Math.min(area.getHeight(), neigh.getHeight()) / 2);
+                    if (threshold < 0) threshold = 0;
+                    //check if the nodes could be on the same line
                     if (AreaUtils.isOnSameLine(area, neigh, threshold))
                     {
                         ret.insertElementAt(neigh, 0);
