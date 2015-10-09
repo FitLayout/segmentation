@@ -6,7 +6,6 @@
 package org.fit.segm.grouping;
 
 import org.fit.segm.grouping.op.GroupAnalyzer;
-import org.fit.segm.grouping.op.GroupAnalyzerByStyles;
 import org.fit.segm.grouping.op.SeparatorSet;
 import org.fit.segm.grouping.op.SeparatorSetHVS;
 
@@ -51,10 +50,11 @@ public class Config
      */
     public static GroupAnalyzer createGroupAnalyzer(AreaImpl root)
     {
-        //return new GroupAnalyzerByGrouping(root);
-        //return new GroupAnalyzerBySeparators(root);
-        //return new GroupAnalyzerByGroupingAndSeparators(root);
-        return new GroupAnalyzerByStyles(root, 1, false);
+        //return new org.fit.segm.grouping.op.GroupAnalyzerByGrouping(root);
+        //return new org.fit.segm.grouping.op.GroupAnalyzerBySeparators(root);
+        //return new org.fit.segm.grouping.op.GroupAnalyzerByGroupingAndSeparators(root);
+        //return new org.fit.segm.grouping.op.GroupAnalyzerByFlooding(root);
+        return new org.fit.segm.grouping.op.GroupAnalyzerByStyles(root, 1, false);
     }
     
     /**
