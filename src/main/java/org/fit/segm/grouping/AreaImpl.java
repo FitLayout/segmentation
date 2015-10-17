@@ -988,7 +988,7 @@ public class AreaImpl extends DefaultArea implements Area
     //==========================================================================
     
     /**
-     * @return <code>true<code> if the area is separated from the areas below it
+     * @return {@code true} if the area is separated from the areas below it
      */
     public boolean separatedDown()
     {
@@ -996,7 +996,7 @@ public class AreaImpl extends DefaultArea implements Area
     }
     
     /**
-     * @return <code>true<code> if the area is separated from the areas above it
+     * @return {@code true} if the area is separated from the areas above it
      */
     public boolean separatedUp()
     {
@@ -1004,7 +1004,7 @@ public class AreaImpl extends DefaultArea implements Area
     }
     
     /**
-     * @return <code>true<code> if the area is separated from the areas on the left
+     * @return {@code true} if the area is separated from the areas on the left
      */
     public boolean separatedLeft()
     {
@@ -1012,7 +1012,7 @@ public class AreaImpl extends DefaultArea implements Area
     }
     
     /**
-     * @return <code>true<code> if the area is separated from the areas on the right
+     * @return {@code true} if the area is separated from the areas on the right
      */
     public boolean separatedRight()
     {
