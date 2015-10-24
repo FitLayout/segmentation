@@ -475,6 +475,18 @@ public class AreaImpl extends DefaultArea implements Area
             return null;
     }
     
+    @Override
+    public Area copy()
+    {
+        Area ret = new AreaImpl(this);
+        if (getParentArea() != null)
+        {
+            int ndx = getParentArea().getIndex(this);
+            getParentArea().insertChild(ret, ndx + 1);
+        }
+        return ret;
+    }
+    
     /**
      * Returns the font size declared for the first box. If there are multiple boxes,
      * the first one is used. If there are no boxes (an artificial area), 0 is returned.
