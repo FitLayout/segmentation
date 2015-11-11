@@ -40,6 +40,7 @@ public class SegmentationAreaTree implements AreaTree
     {
         page = srcpage;
         rootarea = new AreaImpl(0, 0, 0, 0);
+        rootarea.setAreaTree(this);
         rootarea.setPage(srcpage);
     }
     
@@ -58,6 +59,7 @@ public class SegmentationAreaTree implements AreaTree
     public Area findBasicAreas()
     {
         rootarea = new AreaImpl(0, 0, 0, 0);
+        rootarea.setAreaTree(this);
         rootarea.setPage(page);
         for (int i = 0; i < page.getRoot().getChildCount(); i++)
         {
@@ -107,6 +109,12 @@ public class SegmentationAreaTree implements AreaTree
         }
     }
     
+    @Override
+    public void updateTopologies()
+    {
+        createGrids(rootarea);
+    }
+
     /**
      * Goes through all the areas in the tree and creates the grids in these areas
      * @param root the root node of the tree of areas
