@@ -246,8 +246,10 @@ public class AreaImpl extends DefaultArea implements Area
         if (hasBottomBorder()) bs += "_";
         if (isBackgroundSeparated()) bs += "*";
         
-        /*if (isHorizontalSeparator()) bs += "H";
-        if (isVerticalSeparator()) bs += "I";*/
+        if (isHorizontalSeparator()) bs += "H";
+        if (isVerticalSeparator()) bs += "I";
+        
+        bs += " " + getId() + ": ";
         
         /*if (getBackgroundColor() != null)
             bs += "\"" + String.format("#%02x%02x%02x", getBackgroundColor().getRed(), getBackgroundColor().getGreen(), getBackgroundColor().getBlue()) + "\"";*/
