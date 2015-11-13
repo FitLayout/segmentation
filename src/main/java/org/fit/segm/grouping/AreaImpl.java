@@ -435,8 +435,8 @@ public class AreaImpl extends DefaultArea implements Area
     @Override
     public boolean isHorizontalSeparator()
     {
-        return getBounds().getHeight() < 10
-               && getBounds().getWidth() > 20 * getBounds().getHeight()
+        return ((getBounds().getHeight() < 10 && getBounds().getWidth() > 20 * getBounds().getHeight())
+                || (getBounds().getHeight() < 3 && getBounds().getWidth() > 6))
                && (separatedUp() || separatedDown())
                && !containsText();
     }
@@ -449,8 +449,8 @@ public class AreaImpl extends DefaultArea implements Area
     @Override
     public boolean isVerticalSeparator()
     {
-        return getBounds().getWidth() < 10
-               && getBounds().getHeight() > 20 * getBounds().getWidth()
+        return ((getBounds().getWidth() < 10 && getBounds().getHeight() > 20 * getBounds().getWidth())
+                || (getBounds().getWidth() < 3 && getBounds().getHeight() > 6))
                && (separatedLeft() || separatedRight())
                && !containsText();
     }
