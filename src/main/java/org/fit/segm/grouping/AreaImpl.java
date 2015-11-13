@@ -458,23 +458,22 @@ public class AreaImpl extends DefaultArea implements Area
     @Override
     public Area createSuperArea(Rectangular gp, List<Area> selected, String name)
     {
-        if (getChildCount() > 1 && selected.size() > 1 && selected.size() != getChildCount())
+        AreaImpl area = new AreaImpl(getX1() + getGrid().getColOfs(gp.getX1()),
+                                     getY1() + getGrid().getRowOfs(gp.getY1()),
+                                     getX1() + getGrid().getColOfs(gp.getX2()+1) - 1,
+                                     getY1() + getGrid().getRowOfs(gp.getY2()+1) - 1);
+        area.setName(name);
+        if (getChildCount() > 0 && selected.size() > 0)
         {
-            //create the new area
-            AreaImpl area = new AreaImpl(getX1() + getGrid().getColOfs(gp.getX1()),
-                                         getY1() + getGrid().getRowOfs(gp.getY1()),
-                                         getX1() + getGrid().getColOfs(gp.getX2()+1) - 1,
-                                         getY1() + getGrid().getRowOfs(gp.getY2()+1) - 1);
-            area.setName(name);
             int index = getIndex(selected.get(0));
             insertChild(area, index);
-            area.appendChildren(selected);
-            area.createGrid();
-            createGrid();
-            return area;
         }
         else
-            return null;
+            appendChild(area);
+        area.appendChildren(selected);
+        area.createGrid();
+        createGrid();
+        return area;
     }
     
     @Override
