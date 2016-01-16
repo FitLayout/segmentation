@@ -8,8 +8,8 @@ package org.fit.segm.grouping;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.fit.layout.impl.DefaultAreaTree;
 import org.fit.layout.model.Area;
-import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.DisplayType;
 import org.fit.layout.model.Box.Type;
@@ -22,15 +22,8 @@ import org.fit.layout.model.Tag;
  * 
  * @author burgetr
  */
-public class SegmentationAreaTree implements AreaTree
+public class SegmentationAreaTree extends DefaultAreaTree
 {
-    /** The source tree */
-    protected Page page;
-    
-    /** The root node area */
-    protected AreaImpl rootarea;
-    
-    //=================================================================================
     
     /**
      * Create a new tree of areas by the analysis of a box tree
@@ -38,18 +31,11 @@ public class SegmentationAreaTree implements AreaTree
      */
     public SegmentationAreaTree(Page srcpage)
     {
-        page = srcpage;
-        rootarea = new AreaImpl(0, 0, 0, 0);
+        super(srcpage);
+        AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
         rootarea.setAreaTree(this);
         rootarea.setPage(srcpage);
-    }
-    
-    /**
-     * @return the root node of the tree of areas
-     */
-    public Area getRoot()
-    {
-        return rootarea;
+        setRoot(rootarea);
     }
     
     /**
@@ -58,7 +44,8 @@ public class SegmentationAreaTree implements AreaTree
      */
     public Area findBasicAreas()
     {
-        rootarea = new AreaImpl(0, 0, 0, 0);
+        AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
+        setRoot(rootarea);
         rootarea.setAreaTree(this);
         rootarea.setPage(page);
         for (int i = 0; i < page.getRoot().getChildCount(); i++)
@@ -112,7 +99,7 @@ public class SegmentationAreaTree implements AreaTree
     @Override
     public void updateTopologies()
     {
-        createGrids(rootarea);
+        createGrids((AreaImpl) getRoot());
     }
 
     /**
@@ -166,53 +153,6 @@ public class SegmentationAreaTree implements AreaTree
 
     }
     
-    
-    //=================================================================================
-    // node search
-    //=================================================================================
-    
-    public Area getAreaAt(int x, int y)
-    {
-        return recursiveGetAreaAt(rootarea, x, y);
-    }
-    
-    private Area recursiveGetAreaAt(Area root, int x, int y)
-    {
-        if (root.getBounds().contains(x, y))
-        {
-            for (int i = 0; i < root.getChildCount(); i++)
-            {
-                Area ret = recursiveGetAreaAt(root.getChildArea(i), x, y);
-                if (ret != null)
-                    return ret;
-            }
-            return root;
-        }
-        else
-            return null;
-    }
-    
-    public Area getAreaByName(String name)
-    {
-        return recursiveGetAreaByName(rootarea, name);
-    }
-    
-    private Area recursiveGetAreaByName(Area root, String name)
-    {
-        if (root.toString().indexOf(name) != -1) //TODO ???
-            return root;
-        else
-        {
-            for (int i = 0; i < root.getChildCount(); i++)
-            {
-                Area ret = recursiveGetAreaByName(root.getChildArea(i), name);
-                if (ret != null)
-                    return ret;
-            }
-            return null;
-        }
-    }
-
     //=================================================================================
     // tagging
     //=================================================================================
