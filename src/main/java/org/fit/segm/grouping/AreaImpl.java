@@ -885,7 +885,7 @@ public class AreaImpl extends DefaultArea implements Area
 	 * Adds a new box to the area and updates the area bounds.
 	 * @param box the new box to add
 	 */
-	protected void addBox(Box box)
+	public void addBox(Box box)
 	{
 		super.addBox(box);
 		updateAveragesForBox(box);
