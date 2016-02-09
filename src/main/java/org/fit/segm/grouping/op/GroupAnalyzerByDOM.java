@@ -37,7 +37,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             {
                 AreaImpl chld = (AreaImpl) parent.getChildArea(i);
                 Integer cid = getId(chld);
-                if (cid != null && cid == srcId)
+                if (cid != null && cid.equals(srcId))
                 {
                     selected.add(chld);
                     if (mingp == null)
