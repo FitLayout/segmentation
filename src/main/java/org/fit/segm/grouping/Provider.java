@@ -71,7 +71,7 @@ public class Provider extends BaseAreaTreeProvider
         return paramTypes;
     }
 
-    public boolean getPresereAuxAreas()
+    public boolean getPreserveAuxAreas()
     {
         return preserveAuxAreas;
     }
