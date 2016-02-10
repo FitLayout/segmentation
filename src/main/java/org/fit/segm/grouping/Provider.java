@@ -16,6 +16,22 @@ import org.fit.layout.model.Page;
  */
 public class Provider extends BaseAreaTreeProvider
 {
+    private final String[] paramNames = { "preserveAuxAreas" };
+    private final ValueType[] paramTypes = { ValueType.BOOLEAN };
+
+    /** Preserve the auxiliary areas that have no visual impact */
+    private boolean preserveAuxAreas;
+    
+    
+    public Provider()
+    {
+        this.preserveAuxAreas = false;
+    }
+    
+    public Provider(boolean presereAuxAreas)
+    {
+        this.preserveAuxAreas = presereAuxAreas;
+    }
 
     @Override
     public String getId()
@@ -38,7 +54,7 @@ public class Provider extends BaseAreaTreeProvider
     @Override
     public AreaTree createAreaTree(Page page)
     {
-        SegmentationAreaTree atree = new SegmentationAreaTree(page);
+        SegmentationAreaTree atree = new SegmentationAreaTree(page, preserveAuxAreas);
         atree.findBasicAreas();
         return atree; 
     }
@@ -46,13 +62,23 @@ public class Provider extends BaseAreaTreeProvider
     @Override
     public String[] getParamNames()
     {
-        return new String[0];
+        return paramNames;
     }
 
     @Override
     public ValueType[] getParamTypes()
     {
-        return new ValueType[0];
+        return paramTypes;
+    }
+
+    public boolean getPresereAuxAreas()
+    {
+        return preserveAuxAreas;
+    }
+
+    public void setPreserveAuxAreas(boolean preserveAuxAreas)
+    {
+        this.preserveAuxAreas = preserveAuxAreas;
     }
 
 }

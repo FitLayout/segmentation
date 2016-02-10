@@ -24,14 +24,19 @@ import org.fit.layout.model.Tag;
  */
 public class SegmentationAreaTree extends DefaultAreaTree
 {
+    /** Preserve the auxiliary areas that have no visual impact */
+    private boolean preserveAuxAreas;
     
     /**
      * Create a new tree of areas by the analysis of a box tree
      * @param srcpage the source box tree
+     * @param preserveAuxAreas preserve the auxiliary areas that are not visually separated but
+     * they are used as containers containing other ares.
      */
-    public SegmentationAreaTree(Page srcpage)
+    public SegmentationAreaTree(Page srcpage, boolean preserveAuxAreas)
     {
         super(srcpage);
+        this.preserveAuxAreas = preserveAuxAreas;
         AreaImpl rootarea = new AreaImpl(0, 0, 0, 0);
         rootarea.setAreaTree(this);
         rootarea.setPage(srcpage);
@@ -50,8 +55,8 @@ public class SegmentationAreaTree extends DefaultAreaTree
         rootarea.setPage(page);
         for (int i = 0; i < page.getRoot().getChildCount(); i++)
         {
-            Area sub;
-            sub = new AreaImpl(page.getRoot().getChildBox(i));
+            Box cbox = page.getRoot().getChildBox(i);
+            Area sub = new AreaImpl(cbox);
             if (sub.getWidth() > 1 || sub.getHeight() > 1)
             {
                 findStandaloneAreas(page.getRoot().getChildBox(i), sub);
@@ -113,7 +118,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
             createGrids((AreaImpl) root.getChildArea(i));
     }
 
-    public static boolean isVisuallySeparated(Box box)
+    public boolean isVisuallySeparated(Box box)
     {
         //invisible boxes are not separated
         if (!box.isVisible()) 
@@ -142,13 +147,18 @@ public class SegmentationAreaTree extends DefaultAreaTree
         //other element boxes
         else 
         {
-            //check if separated by border -- at least one border needed
-            if (box.getBorderCount() >= 1)
+            if (preserveAuxAreas)
                 return true;
-            //check the background
-            else if (box.isBackgroundSeparated())
-                return true;
-            return false;
+            else
+            {
+                //check if separated by border -- at least one border needed
+                if (box.getBorderCount() >= 1)
+                    return true;
+                //check the background
+                else if (box.isBackgroundSeparated())
+                    return true;
+                return false;
+            }
         }
 
     }
