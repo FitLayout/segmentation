@@ -110,7 +110,7 @@ public class SeparatorSetHVS extends SeparatorSet
             //the box covers the separator -- remove the separator 
             if (ay1 <= sy1 && ay2 >= sy2)
             {
-                    it.remove();
+                it.remove();
             }
             //box entirely inside -- split the separator 
             else if (ay1 > sy1 && ay2 < sy2)
@@ -120,16 +120,20 @@ public class SeparatorSetHVS extends SeparatorSet
                                                  sep.getX2(), sep.getY2());
                 newseps.add(newsep);
                 sep.setY2(ay1 - 1);
+                newsep.setArea1(area);
+                sep.setArea2(area);
             }
             //box partially covers the separator -- update the separator
             else if ((ay1 > sy1 && ay1 <= sy2) && ay2 >= sy2)
             {
                 sep.setY2(ay1 - 1);
+                sep.setArea2(area);
             }
             //box partially covers the separator -- update the separator
             else if (ay1 <= sy1 && (ay2 >= sy1 && ay2 < sy2))
             {
                 sep.setY1(ay2 + 1);
+                sep.setArea1(area);
             }
         }
         hsep.addAll(newseps);
@@ -154,16 +158,20 @@ public class SeparatorSetHVS extends SeparatorSet
                                                  sep.getX2(), sep.getY2());
                 newseps.add(newsep);
                 sep.setX2(ax1 - 1);
+                newsep.setArea1(area);
+                sep.setArea2(area);
             }
             //box partially covers the separator -- update the separator
             else if ((ax1 > sx1 && ax1 <= sx2) && ax2 >= sx2)
             {
                 sep.setX2(ax1 - 1);
+                sep.setArea2(area);
             }
             //box partially covers the separator -- update the separator
             else if (ax1 <= sx1 && (ax2 >= sx1 && ax2 < sx2))
             {
                 sep.setX1(ax2 + 1);
+                sep.setArea1(area);
             }
         }
         vsep.addAll(newseps);
