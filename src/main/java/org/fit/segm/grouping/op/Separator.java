@@ -43,8 +43,8 @@ public class Separator extends Rectangular implements Comparable<Separator>
 	{
         super(orig);
         this.type = orig.type;
-        area1 = null;
-        area2 = null;
+        area1 = orig.area1;
+        area2 = orig.area2;
 	}
 	
     public Separator(short type, Rectangular rect)
