@@ -46,6 +46,7 @@ public class GroupAnalyzer
     	/* This is a simple testing SuperArea implementation. It groups each 
     	 * subarea with its first sibling area.*/ 
         AreaImpl ret = new AreaImpl(0, 0, 0, 0);
+        ret.setPage(sub.getPage());
         AreaImpl sibl = (AreaImpl) sub.getNextSibling();
         selected.removeAllElements();
         selected.add(sub);

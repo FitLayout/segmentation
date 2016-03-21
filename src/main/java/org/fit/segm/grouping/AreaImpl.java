@@ -463,6 +463,7 @@ public class AreaImpl extends DefaultArea implements Area
                                      getX1() + getGrid().getColOfs(gp.getX2()+1) - 1,
                                      getY1() + getGrid().getRowOfs(gp.getY2()+1) - 1);
         area.setName(name);
+        area.setPage(getPage());
         if (getChildCount() > 0 && selected.size() > 0)
         {
             int index = getIndex(selected.get(0));

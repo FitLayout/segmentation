@@ -93,6 +93,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
                              parent.getY1() + grid.getRowOfs(mingp.getY1()),
                              parent.getX1() + grid.getColOfs(mingp.getX2()+1) - 1,
                              parent.getY1() + grid.getRowOfs(mingp.getY2()+1) - 1);
+        area.setPage(sub.getPage());
         //area.setBorders(true, true, true, true);
         area.setLevel(1);
         //if (!mingp.equals(sub.getGridPosition()))
