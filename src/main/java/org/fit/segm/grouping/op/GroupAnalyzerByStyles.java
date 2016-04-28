@@ -64,12 +64,9 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         //starting grid position
         Rectangular gp = new Rectangular(sub.getGridPosition());
         System.out.println("GSS************* Start: " + gp + " - " + sub);
-        //if (sub.toString().contains("6+"))
-        if (gp.toString().contains("[122, 22, 128, 25]"))
-            System.out.println("jo!");
         
         //try to expand to the whole grid
-        Rectangular limit = new Rectangular(0, 0, grid.getWidth()-1, grid.getHeight()-1);
+        Rectangular limit = new Rectangular(0, 0, getGrid().getWidth()-1, getGrid().getHeight()-1);
         expandToLimit(sub, gp, limit, sub, true, true, DIR_RIGHT, REQ_BOTH);
         
         //select areas inside of the area found
@@ -89,18 +86,17 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         }
         
         //create the new area
-        AreaImpl area = new AreaImpl(parent.getX1() + grid.getColOfs(mingp.getX1()),
-                             parent.getY1() + grid.getRowOfs(mingp.getY1()),
-                             parent.getX1() + grid.getColOfs(mingp.getX2()+1) - 1,
-                             parent.getY1() + grid.getRowOfs(mingp.getY2()+1) - 1);
+        AreaImpl area = new AreaImpl(parent.getX1() + getGrid().getColOfs(mingp.getX1()),
+                             parent.getY1() + getGrid().getRowOfs(mingp.getY1()),
+                             parent.getX1() + getGrid().getColOfs(mingp.getX2()+1) - 1,
+                             parent.getY1() + getGrid().getRowOfs(mingp.getY2()+1) - 1);
         area.setPage(sub.getPage());
         //area.setBorders(true, true, true, true);
         area.setLevel(1);
         //if (!mingp.equals(sub.getGridPosition()))
         //    System.out.println("Found area: " + area + " : " + mingp);
-        AreaImpl ret = new AreaImpl(area);
-        ret.setGridPosition(mingp);
-        return ret;
+        area.setGridPosition(mingp);
+        return area;
     }
     
     /**
@@ -124,7 +120,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     	//debugColor = new java.awt.Color(debugColor.getBlue(), debugColor.getRed(), debugColor.getGreen());*/
         //hsep = true;
         //vsep = true;
-        if (grid.getWidth() > 0 && grid.getHeight() > 0 && !sub.isBackgroundSeparated())
+        if (getGrid().getWidth() > 0 && getGrid().getHeight() > 0 && !sub.isBackgroundSeparated())
         {
             int dir = prefDir;
             int attempts = 0;
@@ -248,8 +244,6 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     private int expandVertically(Rectangular gp, Rectangular limit, AreaImpl template, boolean down, boolean sep)
     {
         //System.out.println("exp: " + gp + (down?" _":" ^") + " " + sep);
-        if (gp.toString().equals("[91, 20, 105, 25]"))
-            System.out.println("jo!");
         int na = down ? gp.getY2() : gp.getY1(); //what to return when it's not possible to expand
         int targety = down ? (gp.getY2() + 1) : (gp.getY1() - 1); 
         //find candidate boxes
@@ -257,7 +251,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         int x = gp.getX1();
         while (x <= gp.getX2()) //scan everything at the target position
         {
-            AreaImpl cand = (AreaImpl) grid.getAreaAt(x, targety);
+            AreaImpl cand = (AreaImpl) getGrid().getAreaAt(x, targety);
             //ignore candidates that intersect with our area (could leat to an infinite loop)
             if (cand == null || cand.getGridPosition().intersects(gp))
                 x++;
@@ -327,7 +321,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         int y = gp.getY1();
         while (y <= gp.getY2()) //scan everything at the target position
         {
-            AreaImpl cand = (AreaImpl) grid.getAreaAt(targetx, y);
+            AreaImpl cand = (AreaImpl) getGrid().getAreaAt(targetx, y);
             //ignore candidates that intersect with our area (could leat to an infinite loop)
             if (cand != null && !cand.getGridPosition().intersects(gp))
             {
@@ -379,10 +373,10 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
 
     private boolean separatorDown(Rectangular pos)
     {
-        if (pos.getY2() < grid.getHeight()-1)
+        if (pos.getY2() < getGrid().getHeight()-1)
         {
-            Rectangular spos = grid.getAreaBoundsAbsolute(pos.getX1(), pos.getY2(), pos.getX2(), pos.getY2());
-            Rectangular epos = grid.getAreaBoundsAbsolute(pos.getX1(), pos.getY2() + 1, pos.getX2(), pos.getY2() + 1);
+            Rectangular spos = getGrid().getAreaBoundsAbsolute(pos.getX1(), pos.getY2(), pos.getX2(), pos.getY2());
+            Rectangular epos = getGrid().getAreaBoundsAbsolute(pos.getX1(), pos.getY2() + 1, pos.getX2(), pos.getY2() + 1);
             return seps.isSeparatorAt(spos.midX(), spos.getY2()) ||
                    seps.isSeparatorAt(epos.midX(), epos.getY1());
         }
@@ -394,8 +388,8 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     {
         if (pos.getY1() > 0)
         {
-            Rectangular spos = grid.getAreaBoundsAbsolute(pos.getX1(), pos.getY1(), pos.getX2(), pos.getY1());
-            Rectangular epos = grid.getAreaBoundsAbsolute(pos.getX1(), pos.getY1() - 1, pos.getX2(), pos.getY1() - 1);
+            Rectangular spos = getGrid().getAreaBoundsAbsolute(pos.getX1(), pos.getY1(), pos.getX2(), pos.getY1());
+            Rectangular epos = getGrid().getAreaBoundsAbsolute(pos.getX1(), pos.getY1() - 1, pos.getX2(), pos.getY1() - 1);
             return seps.isSeparatorAt(spos.midX(), spos.getY1()) ||
                    seps.isSeparatorAt(epos.midX(), epos.getY2());
         }
@@ -407,8 +401,8 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     {
         if (pos.getX1() > 0)
         {
-            Rectangular spos = grid.getAreaBoundsAbsolute(pos.getX1(), pos.getY1(), pos.getX1(), pos.getY2());
-            Rectangular epos = grid.getAreaBoundsAbsolute(pos.getX1() - 1, pos.getY1(), pos.getX1() - 1, pos.getY2());
+            Rectangular spos = getGrid().getAreaBoundsAbsolute(pos.getX1(), pos.getY1(), pos.getX1(), pos.getY2());
+            Rectangular epos = getGrid().getAreaBoundsAbsolute(pos.getX1() - 1, pos.getY1(), pos.getX1() - 1, pos.getY2());
             return seps.isSeparatorAt(spos.getX1(), spos.midY()) ||
                    seps.isSeparatorAt(epos.getX2(), epos.midY());
         }
@@ -418,10 +412,10 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     
     private boolean separatorRight(Rectangular pos)
     {
-        if (pos.getX2() < grid.getWidth()-1)
+        if (pos.getX2() < getGrid().getWidth()-1)
         {
-            Rectangular spos = grid.getAreaBoundsAbsolute(pos.getX2(), pos.getY1(), pos.getX2(), pos.getY2());
-            Rectangular epos = grid.getAreaBoundsAbsolute(pos.getX2() + 1, pos.getY1(), pos.getX2() + 1, pos.getY2());
+            Rectangular spos = getGrid().getAreaBoundsAbsolute(pos.getX2(), pos.getY1(), pos.getX2(), pos.getY2());
+            Rectangular epos = getGrid().getAreaBoundsAbsolute(pos.getX2() + 1, pos.getY1(), pos.getX2() + 1, pos.getY2());
             return seps.isSeparatorAt(spos.getX2(), spos.midY()) ||
                    seps.isSeparatorAt(epos.getX1(), epos.midY());
         }

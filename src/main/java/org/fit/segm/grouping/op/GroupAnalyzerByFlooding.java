@@ -33,7 +33,7 @@ public class GroupAnalyzerByFlooding extends GroupAnalyzer
         seps = parent.getSeparators();
         System.out.println("************* Start: " + sub);
         //try to expand
-        //Rectangular limit = new Rectangular(0, 0, grid.getWidth()-1, grid.getHeight()-1);
+        //Rectangular limit = new Rectangular(0, 0, getGrid().getWidth()-1, getGrid().getHeight()-1);
         //expandToLimit(sub, gp, limit, true, true);
         Rectangular gp;
         if (sub.isExplicitlySeparated())
@@ -59,12 +59,12 @@ public class GroupAnalyzerByFlooding extends GroupAnalyzer
             }
         }
         
-        System.out.println("Area: " + parent + " Grid: " + grid + " Mingp: " + mingp);
+        System.out.println("Area: " + parent + " Grid: " + getGrid() + " Mingp: " + mingp);
         //create the new area
-        AreaImpl area = new AreaImpl(parent.getX1() + grid.getColOfs(mingp.getX1()),
-                             parent.getY1() + grid.getRowOfs(mingp.getY1()),
-                             parent.getX1() + grid.getColOfs(mingp.getX2()+1) - 1,
-                             parent.getY1() + grid.getRowOfs(mingp.getY2()+1) - 1);
+        AreaImpl area = new AreaImpl(parent.getX1() + getGrid().getColOfs(mingp.getX1()),
+                             parent.getY1() + getGrid().getRowOfs(mingp.getY1()),
+                             parent.getX1() + getGrid().getColOfs(mingp.getX2()+1) - 1,
+                             parent.getY1() + getGrid().getRowOfs(mingp.getY2()+1) - 1);
         area.setPage(sub.getPage());
         //area.setBorders(true, true, true, true);
         System.out.println("Found area: " + area);
@@ -90,10 +90,10 @@ public class GroupAnalyzerByFlooding extends GroupAnalyzer
      */
     private Rectangular flood(int x, int y)
     {
-        boolean[][] visited = new boolean[grid.getWidth()][grid.getHeight()];
-        boolean[][] filled = new boolean[grid.getWidth()][grid.getHeight()];
-        for (int i = 0; i < grid.getWidth(); i++)
-            for (int j = 0; j < grid.getHeight(); j++)
+        boolean[][] visited = new boolean[getGrid().getWidth()][getGrid().getHeight()];
+        boolean[][] filled = new boolean[getGrid().getWidth()][getGrid().getHeight()];
+        for (int i = 0; i < getGrid().getWidth(); i++)
+            for (int j = 0; j < getGrid().getHeight(); j++)
             {
                 visited[i][j] = false;
                 filled[i][j] = false;
@@ -115,7 +115,7 @@ public class GroupAnalyzerByFlooding extends GroupAnalyzer
             ret.expandToEnclose(cur);
             
             filled[sx][sy] = true;
-            Rectangular spos = grid.getCellBoundsAbsolute(sx, sy);
+            Rectangular spos = getGrid().getCellBoundsAbsolute(sx, sy);
             //dispCell(sx, sy);
             
             //up
@@ -123,17 +123,17 @@ public class GroupAnalyzerByFlooding extends GroupAnalyzer
             if (sy > 0 && canFlood(visited, filled, sx, sy, -1, true))
             {
                 visited[sx][sy-1] = true;
-                Rectangular epos = grid.getCellBoundsAbsolute(sx, sy-1);
+                Rectangular epos = getGrid().getCellBoundsAbsolute(sx, sy-1);
                 if (!seps.isSeparatorAt(spos.midX(), spos.getY1()) &&
                     !seps.isSeparatorAt(epos.midX(), epos.getY2()))
                     queue.offer(new Rectangular(sx, sy-1, sx, sy-1));
             }
             //down
-            //if (sy < grid.getHeight()-1 && !visited[sx][sy+1])
-            if (sy < grid.getHeight()-1 && canFlood(visited, filled, sx, sy, 1, true))
+            //if (sy < getGrid().getHeight()-1 && !visited[sx][sy+1])
+            if (sy < getGrid().getHeight()-1 && canFlood(visited, filled, sx, sy, 1, true))
             {
                 visited[sx][sy+1] = true;
-                Rectangular epos = grid.getCellBoundsAbsolute(sx, sy+1);
+                Rectangular epos = getGrid().getCellBoundsAbsolute(sx, sy+1);
                 if (!seps.isSeparatorAt(spos.midX(), spos.getY2()) &&
                     !seps.isSeparatorAt(epos.midX(), epos.getY1()))
                     queue.offer(new Rectangular(sx, sy+1, sx, sy+1));
@@ -143,17 +143,17 @@ public class GroupAnalyzerByFlooding extends GroupAnalyzer
             if (sx > 0 && canFlood(visited, filled, sx, sy, -1, false))
             {
                 visited[sx-1][sy] = true;
-                Rectangular epos = grid.getCellBoundsAbsolute(sx-1, sy);
+                Rectangular epos = getGrid().getCellBoundsAbsolute(sx-1, sy);
                 if (!seps.isSeparatorAt(spos.getX1(), spos.midY()) &&
                     !seps.isSeparatorAt(epos.getX2(), epos.midY()))
                     queue.offer(new Rectangular(sx-1, sy, sx-1, sy));
             }
             //right
-            //if (sx < grid.getWidth()-1 && !visited[sx+1][sy])
-            if (sx < grid.getWidth()-1 && canFlood(visited, filled, sx, sy, 1, false))
+            //if (sx < getGrid().getWidth()-1 && !visited[sx+1][sy])
+            if (sx < getGrid().getWidth()-1 && canFlood(visited, filled, sx, sy, 1, false))
             {
                 visited[sx+1][sy] = true;
-                Rectangular epos = grid.getCellBoundsAbsolute(sx+1, sy);
+                Rectangular epos = getGrid().getCellBoundsAbsolute(sx+1, sy);
                 if (!seps.isSeparatorAt(spos.getX2(), spos.midY()) &&
                     !seps.isSeparatorAt(epos.getX1(), epos.midY()))
                     queue.offer(new Rectangular(sx+1, sy, sx+1, sy));

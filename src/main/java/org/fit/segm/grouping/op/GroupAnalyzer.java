@@ -18,17 +18,20 @@ import org.fit.segm.grouping.AreaImpl;
 public class GroupAnalyzer
 {
     protected AreaImpl parent;
-    protected AreaGrid grid; 
     
     public GroupAnalyzer(AreaImpl parent)
     {
         this.parent = parent;
-        grid = parent.getGrid();
     }
     
     public AreaImpl getParent()
     {
         return parent;
+    }
+    
+    public AreaGrid getGrid()
+    {
+        return parent.getGrid();
     }
     
     /**
