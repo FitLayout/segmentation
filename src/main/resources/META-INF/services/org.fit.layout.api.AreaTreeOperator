@@ -6,3 +6,4 @@ org.fit.segm.grouping.op.SortByPositionOperator
 org.fit.segm.grouping.op.SortByLinesOperator
 org.fit.segm.grouping.op.CollapseAreasOperator
 org.fit.segm.grouping.op.GroupByDOMOperator
+org.fit.segm.grouping.op.FlattenTreeOperator
