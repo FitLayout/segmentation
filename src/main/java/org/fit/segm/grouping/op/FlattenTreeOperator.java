@@ -75,7 +75,6 @@ public class FlattenTreeOperator extends BaseOperator
         scanAreas(root, addList, removeList);
         for (Area area : addList)
             root.appendChild(area);
-        System.out.println("ToRemove: " + removeList);
         removeAreas(root, removeList);
     }
     
@@ -104,10 +103,7 @@ public class FlattenTreeOperator extends BaseOperator
         for (Area child : curChildren)
         {
             if (toRemove.contains(child))
-            {
                 root.removeChild(child);
-                System.out.println("Removing " + child + " from " + root);
-            }
         }
         root.updateTopologies();
     }
