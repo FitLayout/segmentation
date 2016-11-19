@@ -6,6 +6,7 @@
 package org.fit.segm.grouping;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,8 @@ import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
 import org.fit.segm.grouping.op.Separator;
 import org.fit.segm.grouping.op.SeparatorSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * An area containing several visual boxes.
@@ -29,6 +32,8 @@ import org.fit.segm.grouping.op.SeparatorSet;
  */
 public class AreaImpl extends DefaultArea implements Area
 {
+    private static Logger log = LoggerFactory.getLogger(AreaImpl.class);
+    
     /** Set of separators */
     private SeparatorSet seps;
     
@@ -93,7 +98,7 @@ public class AreaImpl extends DefaultArea implements Area
      * Creates an area from a a list of boxes. Update the area bounds and name accordingly.
      * @param boxList The source boxes that will be contained in this area
      */
-    public AreaImpl(Vector<Box> boxList)
+    public AreaImpl(List<Box> boxList)
     {
         super(boxList);
     }
@@ -122,7 +127,7 @@ public class AreaImpl extends DefaultArea implements Area
     public void appendChild(Area child)
     {
         super.appendChild(child);
-        updateAverages((AreaImpl) child);
+        updateAverages(child);
     }
     
     @Override
@@ -586,18 +591,23 @@ public class AreaImpl extends DefaultArea implements Area
      * Updates the average values when a new area is added or joined
      * @param other the other area
      */
-    public void updateAverages(AreaImpl other)
+    public void updateAverages(Area other)
     {
-        fontSizeCnt += other.fontSizeCnt;
-        fontSizeSum += other.fontSizeSum;
-        fontWeightCnt += other.fontWeightCnt;
-        fontWeightSum += other.fontWeightSum;
-        fontStyleCnt += other.fontStyleCnt;
-        fontStyleSum += other.fontStyleSum;
-        underlineCnt += other.underlineCnt;
-        underlineSum += other.underlineSum;
-        lineThroughCnt += other.lineThroughCnt;
-        lineThroughSum += other.lineThroughSum;
+        if (other instanceof AreaImpl)
+        {
+            fontSizeCnt += ((AreaImpl) other).fontSizeCnt;
+            fontSizeSum += ((AreaImpl) other).fontSizeSum;
+            fontWeightCnt += ((AreaImpl) other).fontWeightCnt;
+            fontWeightSum += ((AreaImpl) other).fontWeightSum;
+            fontStyleCnt += ((AreaImpl) other).fontStyleCnt;
+            fontStyleSum += ((AreaImpl) other).fontStyleSum;
+            underlineCnt += ((AreaImpl) other).underlineCnt;
+            underlineSum += ((AreaImpl) other).underlineSum;
+            lineThroughCnt += ((AreaImpl) other).lineThroughCnt;
+            lineThroughSum += ((AreaImpl) other).lineThroughSum;
+        }
+        else
+            log.error("FIXME: mixing AreaImpl with other area implementations is not implemented now; the averages won't be accurate!");
     }
     
     /**
@@ -635,12 +645,12 @@ public class AreaImpl extends DefaultArea implements Area
     /**
      * Returns the child areas whose absolute coordinates intersect with the specified rectangle.
      */
-    public Vector<AreaImpl> getChildNodesInside(Rectangular r)
+    public List<Area> getChildNodesInside(Rectangular r)
     {
-        Vector<AreaImpl> ret = new Vector<AreaImpl>();
+        ArrayList<Area> ret = new ArrayList<>();
         for (GenericTreeNode child : getChildren())
         {
-            AreaImpl childarea = (AreaImpl) child;
+            Area childarea = (Area) child;
             if (childarea.getBounds().intersects(r))
                 ret.add(childarea);
         }
@@ -654,7 +664,7 @@ public class AreaImpl extends DefaultArea implements Area
     {
         for (GenericTreeNode child : getChildren())
         {
-            AreaImpl childarea = (AreaImpl) child;
+            Area childarea = (Area) child;
             if (childarea.getBounds().intersects(r))
                 return false;
         }

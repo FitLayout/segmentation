@@ -6,6 +6,7 @@
 package org.fit.segm.grouping;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.fit.layout.impl.DefaultAreaTree;
@@ -14,6 +15,7 @@ import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.DisplayType;
 import org.fit.layout.model.Box.Type;
 import org.fit.layout.model.Page;
+import org.fit.layout.model.Rectangular;
 import org.fit.layout.model.Tag;
 
 
@@ -65,6 +67,28 @@ public class SegmentationAreaTree extends DefaultAreaTree
         }
         createGrids(rootarea);
         return rootarea;
+    }
+    
+    //=================================================================================
+    // factory functions producing the AreaImpl areas
+    //=================================================================================
+    
+    @Override
+    public Area createArea(Rectangular r)
+    {
+        return new AreaImpl(r);
+    }
+
+    @Override
+    public Area createArea(Box box)
+    {
+        return new AreaImpl(box);
+    }
+
+    @Override
+    public Area createArea(List<Box> boxes)
+    {
+        return new AreaImpl(boxes);
     }
     
     //=================================================================================
