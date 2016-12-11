@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>cz.vutbr.fit.layout</groupId>
 		<artifactId>parent</artifactId>
-		<version>0.0.3</version>
+		<version>0.0.4-SNAPSHOT</version>
 		<relativePath>../parent/pom.xml</relativePath>
 	</parent>
 	
@@ -40,7 +40,7 @@
 		<url>https://github.com/FitLayout/segmentation</url>
 		<connection>scm:git:git@github.com:FitLayout/segmentation.git</connection>
 		<developerConnection>scm:git:git@github.com:FitLayout/segmentation.git</developerConnection>
-		<tag>layout-segmentation-0.0.3</tag>
+		<tag>HEAD</tag>
     </scm>
     
 	<build>
