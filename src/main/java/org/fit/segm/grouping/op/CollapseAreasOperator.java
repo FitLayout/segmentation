@@ -44,6 +44,12 @@ public class CollapseAreasOperator extends BaseOperator
     }
 
     @Override
+    public String getCategory()
+    {
+        return "restructure";
+    }
+
+    @Override
     public String[] getParamNames()
     {
         return paramNames;

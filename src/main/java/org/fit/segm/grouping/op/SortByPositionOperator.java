@@ -53,6 +53,12 @@ public class SortByPositionOperator extends BaseOperator
     }
 
     @Override
+    public String getCategory()
+    {
+        return "sorting";
+    }
+
+    @Override
     public String[] getParamNames()
     {
         return paramNames;

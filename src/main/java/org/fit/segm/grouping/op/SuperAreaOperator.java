@@ -58,7 +58,13 @@ public class SuperAreaOperator extends BaseOperator
     @Override
     public String getDescription()
     {
-        return "..."; //TODO
+        return "Detects larger visual areas and creates the artificial area nodes";
+    }
+
+    @Override
+    public String getCategory()
+    {
+        return "restructure";
     }
 
     @Override

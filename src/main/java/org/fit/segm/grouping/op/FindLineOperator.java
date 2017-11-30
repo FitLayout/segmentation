@@ -59,7 +59,13 @@ public class FindLineOperator extends BaseOperator
     @Override
     public String getDescription()
     {
-        return "..."; //TODO
+        return "Detects the basic lines in the area tree and joins the appropriate areas so that a line is the smallest visual area";
+    }
+
+    @Override
+    public String getCategory()
+    {
+        return "lines";
     }
 
     @Override

@@ -59,7 +59,13 @@ public class MultiLineOperator extends BaseOperator
     @Override
     public String getDescription()
     {
-        return "..."; //TODO
+        return "Detects sequences of aligned lines and joins them to a single area";
+    }
+
+    @Override
+    public String getCategory()
+    {
+        return "lines";
     }
 
     @Override
