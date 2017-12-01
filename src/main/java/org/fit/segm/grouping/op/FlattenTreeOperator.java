@@ -21,10 +21,6 @@ public class FlattenTreeOperator extends BaseOperator
 {
     //private static Logger log = LoggerFactory.getLogger(FlattenTreeOperator.class);
     
-    protected final String[] paramNames = { };
-    protected final ValueType[] paramTypes = { };
-    
-    
     public FlattenTreeOperator()
     {
     }
@@ -51,18 +47,6 @@ public class FlattenTreeOperator extends BaseOperator
     public String getCategory()
     {
         return "restructure";
-    }
-
-    @Override
-    public String[] getParamNames()
-    {
-        return paramNames;
-    }
-
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
     }
 
     //==============================================================================

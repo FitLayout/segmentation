@@ -16,8 +16,6 @@ import org.fit.segm.grouping.AreaImpl;
  */
 public class GroupByDOMOperator extends SuperAreaOperator
 {
-    protected final String[] paramNames = {};
-    protected final ValueType[] paramTypes = {};
     
     public GroupByDOMOperator()
     {

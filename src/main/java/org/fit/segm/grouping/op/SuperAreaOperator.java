@@ -5,9 +5,13 @@
  */
 package org.fit.segm.grouping.op;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Vector;
 
+import org.fit.layout.api.Parameter;
 import org.fit.layout.impl.BaseOperator;
+import org.fit.layout.impl.ParameterInt;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
@@ -23,9 +27,6 @@ public class SuperAreaOperator extends BaseOperator
     /** Recursion depth limit while detecting the sub-areas */
     protected int depthLimit;
 
-    protected final String[] paramNames = { "depthLimit" };
-    protected final ValueType[] paramTypes = { ValueType.INTEGER };
-    
     /**
      * Creates the deparator with default parameter values.
      */
@@ -68,17 +69,13 @@ public class SuperAreaOperator extends BaseOperator
     }
 
     @Override
-    public String[] getParamNames()
+    public List<Parameter> defineParams()
     {
-        return paramNames;
+        List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterInt("depthLimit"));
+        return ret;
     }
 
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
-    }
-    
     public int getDepthLimit()
     {
         return depthLimit;

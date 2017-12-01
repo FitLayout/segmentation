@@ -5,7 +5,13 @@
  */
 package org.fit.segm.grouping.op;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.fit.layout.api.Parameter;
 import org.fit.layout.impl.BaseOperator;
+import org.fit.layout.impl.ParameterBoolean;
+import org.fit.layout.impl.ParameterFloat;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
@@ -27,9 +33,6 @@ public class MultiLineOperator extends BaseOperator
     
     /** The maximal distance of two areas allowed within a single line (in 'em' units) */
     protected float maxLineEmSpace;
-    
-    protected final String[] paramNames = { "useConsistentStyle", "maxLineEmSpace" };
-    protected final ValueType[] paramTypes = { ValueType.BOOLEAN, ValueType.FLOAT };
     
     
     public MultiLineOperator()
@@ -69,15 +72,12 @@ public class MultiLineOperator extends BaseOperator
     }
 
     @Override
-    public String[] getParamNames()
+    public List<Parameter> defineParams()
     {
-        return paramNames;
-    }
-
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
+        List<Parameter> ret = new ArrayList<>();
+        ret.add(new ParameterBoolean("useConsistentStyle"));
+        ret.add(new ParameterFloat("maxLineEmSpace"));
+        return ret;
     }
 
     public boolean getUseConsistentStyle()

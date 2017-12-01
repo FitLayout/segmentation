@@ -5,9 +5,11 @@
  */
 package org.fit.segm.grouping.op;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 
+import org.fit.layout.api.Parameter;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
@@ -19,8 +21,6 @@ import org.fit.segm.grouping.AreaUtils;
  */
 public class SortByLinesOperator extends SortByPositionOperator
 {
-    protected final String[] paramNames = { };
-    protected final ValueType[] paramTypes = { };
     
     public SortByLinesOperator()
     {
@@ -46,15 +46,9 @@ public class SortByLinesOperator extends SortByPositionOperator
     }
 
     @Override
-    public String[] getParamNames()
+    public List<Parameter> defineParams()
     {
-        return paramNames;
-    }
-
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
+        return Collections.emptyList();
     }
     
     //==============================================================================

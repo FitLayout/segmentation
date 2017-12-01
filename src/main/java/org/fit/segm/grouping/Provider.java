@@ -5,7 +5,12 @@
  */
 package org.fit.segm.grouping;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.fit.layout.api.Parameter;
 import org.fit.layout.impl.BaseAreaTreeProvider;
+import org.fit.layout.impl.ParameterBoolean;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Page;
 
@@ -16,9 +21,6 @@ import org.fit.layout.model.Page;
  */
 public class Provider extends BaseAreaTreeProvider
 {
-    private final String[] paramNames = { "preserveAuxAreas" };
-    private final ValueType[] paramTypes = { ValueType.BOOLEAN };
-
     /** Preserve the auxiliary areas that have no visual impact */
     private boolean preserveAuxAreas;
     
@@ -60,17 +62,13 @@ public class Provider extends BaseAreaTreeProvider
     }
 
     @Override
-    public String[] getParamNames()
+    public List<Parameter> defineParams()
     {
-        return paramNames;
+        List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterBoolean("preserveAuxAreas"));
+        return ret;
     }
-
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
-    }
-
+    
     public boolean getPreserveAuxAreas()
     {
         return preserveAuxAreas;

@@ -5,11 +5,15 @@
  */
 package org.fit.segm.grouping.op;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Vector;
 
+import org.fit.layout.api.Parameter;
 import org.fit.layout.impl.BaseOperator;
+import org.fit.layout.impl.ParameterBoolean;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.AreaTree;
 
@@ -20,9 +24,6 @@ import org.fit.layout.model.AreaTree;
 public class SortByPositionOperator extends BaseOperator
 {
     protected boolean columnFirst;
-    
-    protected final String[] paramNames = { "columnFirst" };
-    protected final ValueType[] paramTypes = { ValueType.BOOLEAN };
     
     public SortByPositionOperator()
     {
@@ -59,17 +60,13 @@ public class SortByPositionOperator extends BaseOperator
     }
 
     @Override
-    public String[] getParamNames()
+    public List<Parameter> defineParams()
     {
-        return paramNames;
+        List<Parameter> ret = new ArrayList<>(1);
+        ret.add(new ParameterBoolean("columnFirst"));
+        return ret;
     }
 
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
-    }
-    
     public boolean getColumnFirst()
     {
         return columnFirst;

@@ -17,9 +17,6 @@ import org.fit.segm.grouping.AreaImpl;
  */
 public class CollapseAreasOperator extends BaseOperator
 {
-    protected final String[] paramNames = {};
-    protected final ValueType[] paramTypes = {};
-    
     
     public CollapseAreasOperator()
     {
@@ -47,18 +44,6 @@ public class CollapseAreasOperator extends BaseOperator
     public String getCategory()
     {
         return "restructure";
-    }
-
-    @Override
-    public String[] getParamNames()
-    {
-        return paramNames;
-    }
-
-    @Override
-    public ValueType[] getParamTypes()
-    {
-        return paramTypes;
     }
 
     //==============================================================================
