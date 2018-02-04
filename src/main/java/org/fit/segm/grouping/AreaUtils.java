@@ -73,33 +73,6 @@ public class AreaUtils
     }
     
     /**
-     * Checks if the given areas are in the same column.
-     * @param a1
-     * @param a2
-     * @return
-     */
-    public static boolean isInSameColumn(Area a1, Area a2)
-    {
-        final Rectangular gp1 = a1.getTopology().getPosition();
-        final Rectangular gp2 = a2.getTopology().getPosition();
-        return (gp1.getX1() == gp2.getX1()); 
-    }
-    
-    /**
-     * Checks if the given areas are aligned in row or column.
-     * @param a1
-     * @param a2
-     * @return
-     */
-    public static boolean isAligned(Area a1, Area a2)
-    {
-        final Rectangular gp1 = a1.getTopology().getPosition();
-        final Rectangular gp2 = a2.getTopology().getPosition();
-        return ((gp1.getX1() == gp2.getX1()) //x-aligned
-                || (gp1.getY1() == gp2.getY1())); //y-aligned
-    }
-    
-    /**
      * Checks if the given area has a target URL assigned (it acts as a link)
      * @param a
      * @return
