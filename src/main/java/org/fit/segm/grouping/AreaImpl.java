@@ -463,10 +463,11 @@ public class AreaImpl extends DefaultArea implements Area
     @Override
     public Area createSuperArea(Rectangular gp, List<Area> selected, String name)
     {
-        AreaImpl area = new AreaImpl(getX1() + getGrid().getColOfs(gp.getX1()),
-                                     getY1() + getGrid().getRowOfs(gp.getY1()),
-                                     getX1() + getGrid().getColOfs(gp.getX2()+1) - 1,
-                                     getY1() + getGrid().getRowOfs(gp.getY2()+1) - 1);
+        //absolute position of the new area
+        Rectangular abspos = getTopology().toPixelPosition(gp);
+        abspos.move(getX1(), getY1());
+        //create the new area
+        AreaImpl area = new AreaImpl(abspos);
         area.setName(name);
         area.setPage(getPage());
         if (getChildCount() > 0 && selected.size() > 0)
@@ -477,8 +478,8 @@ public class AreaImpl extends DefaultArea implements Area
         else
             appendChild(area);
         area.appendChildren(selected);
-        area.createGrid();
-        createGrid();
+        area.updateTopologies();
+        updateTopologies();
         return area;
     }
     
@@ -730,21 +731,21 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasAbove(Separator sep)
     {
-        int gx1 = getGrid().findCellX(sep.getX1());
-        int gx2 = getGrid().findCellX(sep.getX2());
-        int gy = getGrid().findCellY(sep.getY1() - 1);
+        int gx1 = getTopology().toTopologyX(sep.getX1());
+        int gx2 = getTopology().toTopologyX(sep.getX2());
+        int gy = getTopology().toTopologyY(sep.getY1() - 1);
         int ret = 0;
         if (gx1 >= 0 && gx2 >= 0 && gy >= 0)
         {
             int i = gx1;
             while (i <= gx2)
             {
-                AreaImpl node = (AreaImpl) getGrid().getAreaAt(i, gy);
+                AreaImpl node = (AreaImpl) getTopology().findAreaAt(i, gy);
                 //System.out.println("Search: " + i + ":" + gy + " = " + node);
                 if (node != null)
                 {
                     ret++;
-                    i += node.getGridWidth();
+                    i += getTopology().getPosition(node).getWidth();
                 }
                 else
                     i++;
@@ -758,21 +759,21 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasBelow(Separator sep)
     {
-        int gx1 = getGrid().findCellX(sep.getX1());
-        int gx2 = getGrid().findCellX(sep.getX2());
-        int gy = getGrid().findCellY(sep.getY2() + 1);
+        int gx1 = getTopology().toTopologyX(sep.getX1());
+        int gx2 = getTopology().toTopologyX(sep.getX2());
+        int gy = getTopology().toTopologyY(sep.getY2() + 1);
         int ret = 0;
         if (gx1 >= 0 && gx2 >= 0 && gy >= 0)
         {
             int i = gx1;
             while (i <= gx2)
             {
-                AreaImpl node = (AreaImpl) getGrid().getAreaAt(i, gy);
+                AreaImpl node = (AreaImpl) getTopology().findAreaAt(i, gy);
                 //System.out.println("Search: " + i + ":" + gy + " = " + node);
                 if (node != null)
                 {
                     ret++;
-                    i += node.getGridWidth();
+                    i += getTopology().getPosition(node).getWidth();
                 }
                 else
                     i++;
@@ -786,20 +787,20 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasLeft(Separator sep)
     {
-        int gy1 = getGrid().findCellY(sep.getY1());
-        int gy2 = getGrid().findCellY(sep.getY2());
-        int gx = getGrid().findCellX(sep.getX1() - 1);
+        int gy1 = getTopology().toTopologyY(sep.getY1());
+        int gy2 = getTopology().toTopologyY(sep.getY2());
+        int gx = getTopology().toTopologyX(sep.getX1() - 1);
         int ret = 0;
         if (gy1 >= 0 && gy2 >= 0 && gx >= 0)
         {
             int i = gy1;
             while (i <= gy2)
             {
-                AreaImpl node = (AreaImpl) getGrid().getAreaAt(gx, i);
+                AreaImpl node = (AreaImpl) getTopology().findAreaAt(gx, i);
                 if (node != null)
                 {
                     ret++;
-                    i += node.getGridWidth();
+                    i += getTopology().getPosition(node).getWidth();
                 }
                 else
                     i++;
@@ -813,20 +814,20 @@ public class AreaImpl extends DefaultArea implements Area
      */
     private int countAreasRight(Separator sep)
     {
-        int gy1 = getGrid().findCellY(sep.getY1());
-        int gy2 = getGrid().findCellY(sep.getY2());
-        int gx = getGrid().findCellX(sep.getX2() + 1);
+        int gy1 = getTopology().toTopologyY(sep.getY1());
+        int gy2 = getTopology().toTopologyY(sep.getY2());
+        int gx = getTopology().toTopologyX(sep.getX2() + 1);
         int ret = 0;
         if (gy1 >= 0 && gy2 >= 0 && gx >= 0)
         {
             int i = gy1;
             while (i <= gy2)
             {
-                AreaImpl node = (AreaImpl) getGrid().getAreaAt(gx, i);
+                AreaImpl node = (AreaImpl) getTopology().findAreaAt(gx, i);
                 if (node != null)
                 {
                     ret++;
-                    i += node.getGridWidth();
+                    i += getTopology().getPosition(node).getWidth();
                 }
                 else
                     i++;

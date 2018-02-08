@@ -13,6 +13,7 @@ import org.fit.layout.impl.BaseOperator;
 import org.fit.layout.impl.ParameterBoolean;
 import org.fit.layout.impl.ParameterFloat;
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
@@ -135,8 +136,7 @@ public class FindLineOperator extends BaseOperator
     protected void joinAreas(AreaImpl a)
     {
         //TODO: detekce radku by asi mela brat v uvahu separatory
-        if (a.getGrid() == null) //a gird is necessary for this
-            a.createGrid();
+        AreaTopology t = a.getTopology();
         
         boolean change = true;
         while (change)
@@ -145,26 +145,27 @@ public class FindLineOperator extends BaseOperator
             for (int i = 0; i < a.getChildCount(); i++)
             {
                 AreaImpl node = (AreaImpl) a.getChildArea(i);
-                int ny1 = node.getGridPosition().getY1();
-                int nx2 = node.getGridPosition().getX2();
-                int ny2 = node.getGridPosition().getY2();
+                Rectangular pos = t.getPosition(node);
+                int ny1 = pos.getY1();
+                int nx2 = pos.getX2();
+                int ny2 = pos.getY2();
                 
                 //try to expand to the right - find a neighbor
                 AreaImpl neigh = null;
                 int dist = 1;
-                while (neigh == null && nx2 + dist < a.getGrid().getWidth())
+                while (neigh == null && nx2 + dist < t.getTopologyWidth())
                 {
                     //try to find some node at the right in the given distance
                     for (int y = ny1; neigh == null && y <= ny2; y++)
                     {
-                        neigh = (AreaImpl) a.getGrid().getAreaAt(nx2 + dist, y);
+                        neigh = (AreaImpl) t.findAreaAt(nx2 + dist, y);
                         if (neigh != null) //something found
                         {
                             if (!useConsistentStyle || node.hasSameStyle(neigh))
                             {
                                 if (horizontalJoin(a, node, neigh, true)) //try to join
                                 {
-                                    node.createGrid();
+                                    node.updateTopologies();
                                     change = true;
                                 }
                             }
@@ -234,14 +235,14 @@ public class FindLineOperator extends BaseOperator
         {
             if (ey1 < ey2) //n1 ends earlier, try to expand n1 down
             {
-                if (ey1 < parent.getGrid().getWidth()-1 && canExpandY(parent, n1, ey1+1, n2))
+                if (ey1 < parent.getTopology().getTopologyWidth()-1 && canExpandY(parent, n1, ey1+1, n2))
                     ey1++;
                 else
                     return false; //cannot align - give up
             }
             else if (ey1 > ey2) //n2 ends earlier, try to expand n2 down
             {
-                if (ey2 < parent.getGrid().getWidth()-1 && canExpandY(parent, n2, ey2+1, n1))
+                if (ey2 < parent.getTopology().getTopologyWidth()-1 && canExpandY(parent, n2, ey2+1, n1))
                     ey2++;
                 else
                     return false; //cannot align - give up
@@ -272,9 +273,12 @@ public class FindLineOperator extends BaseOperator
      */
     private boolean canExpandY(AreaImpl parent, AreaImpl node, int y, AreaImpl except)
     {
-        for (int x = node.getGridX(); x < node.getGridX() + node.getGridWidth(); x++)
+        AreaTopology t = parent.getTopology();
+        int gx = t.getPosition(node).getX1();
+        int gw = t.getTopologyWidth();
+        for (int x = gx; x < gx + gw; x++)
         {
-            AreaImpl cand = (AreaImpl) parent.getGrid().getAreaAt(x, y);
+            AreaImpl cand = (AreaImpl) t.findAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }

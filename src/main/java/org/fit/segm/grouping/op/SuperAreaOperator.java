@@ -164,7 +164,7 @@ public class SuperAreaOperator extends BaseOperator
                             for (AreaImpl a : selected)
                                 grp.appendChild(a);
                             chld.removeAll(selected);
-                            grp.createGrid();
+                            grp.updateTopologies();;
                             findSuperAreas(grp, passlimit - 1); //in the next level, we use smaller pass limit to stop the recursion
                             changed = true;
                         }
@@ -175,7 +175,7 @@ public class SuperAreaOperator extends BaseOperator
                         }
                     }
                 }
-                root.createGrid();
+                root.updateTopologies();
                 root.removeSimpleSeparators();
                 //System.out.println("Pass: " + pass + " changed: " + changed);
                 pass++;

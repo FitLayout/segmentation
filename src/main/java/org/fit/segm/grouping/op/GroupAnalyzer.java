@@ -7,7 +7,7 @@ package org.fit.segm.grouping.op;
 
 import java.util.Vector;
 
-import org.fit.layout.impl.AreaGrid;
+import org.fit.layout.model.AreaTopology;
 import org.fit.segm.grouping.AreaImpl;
 
 /**
@@ -29,9 +29,9 @@ public class GroupAnalyzer
         return parent;
     }
     
-    public AreaGrid getGrid()
+    public AreaTopology getTopology()
     {
-        return parent.getGrid();
+        return parent.getTopology();
     }
     
     /**

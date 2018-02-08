@@ -123,8 +123,8 @@ public class AreaUtils
             root.insertChild(ret, first);
             for (Area a : selected)
                 ret.appendChild(a);
-            ((AreaImpl) root).createGrid();
-            ret.createGrid();
+            ((AreaImpl) root).updateTopologies();
+            ret.updateTopologies();
             return ret;
         }
         else

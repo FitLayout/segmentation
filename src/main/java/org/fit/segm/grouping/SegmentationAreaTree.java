@@ -137,7 +137,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
      */
     protected void createGrids(AreaImpl root)
     {
-        root.createGrid();
+        root.updateTopologies();
         for (int i = 0; i < root.getChildCount(); i++)
             createGrids((AreaImpl) root.getChildArea(i));
     }

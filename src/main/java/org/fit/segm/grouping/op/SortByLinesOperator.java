@@ -11,6 +11,7 @@ import java.util.Vector;
 
 import org.fit.layout.api.Parameter;
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.AreaTree;
 import org.fit.segm.grouping.AreaImpl;
 import org.fit.segm.grouping.AreaUtils;
@@ -84,8 +85,6 @@ public class SortByLinesOperator extends SortByPositionOperator
      */
     protected void sortChildLines(AreaImpl root)
     {
-        if (root.getGrid() == null) //a gird is necessary for this
-            root.createGrid();
         if (root.getChildCount() > 1)
         {
             List<Area> src = new Vector<Area>(root.getChildAreas());
@@ -112,15 +111,16 @@ public class SortByLinesOperator extends SortByPositionOperator
         final int ny1 = area.getGridPosition().getY1();
         final int nx2 = area.getGridPosition().getX2();
         final int ny2 = area.getGridPosition().getY2();
+        final AreaTopology t = parent.getTopology();
         
         //try to expand to the right
         int dist = 1;
-        while (nx2 + dist < parent.getGrid().getWidth())
+        while (nx2 + dist < t.getTopologyWidth())
         {
             //try to find some node at the right in the given distance
             for (int y = ny1; y <= ny2; y++)
             {
-                AreaImpl neigh = (AreaImpl) parent.getGrid().getAreaAt(nx2 + dist, y);
+                AreaImpl neigh = (AreaImpl) t.findAreaAt(nx2 + dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
                     //the maximal Y difference to consider other areas to be on the same line
@@ -143,7 +143,7 @@ public class SortByLinesOperator extends SortByPositionOperator
             //try to find some node at the right in the given distance
             for (int y = ny1; y <= ny2; y++)
             {
-                AreaImpl neigh = (AreaImpl) parent.getGrid().getAreaAt(nx1 - dist, y);
+                AreaImpl neigh = (AreaImpl) t.findAreaAt(nx1 - dist, y);
                 if (neigh != null && candidates.contains(neigh)) //something found
                 {
                     //the maximal Y difference to consider other areas to be on the same line

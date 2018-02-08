@@ -48,10 +48,9 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             }
             
             //create the new area
-            AreaImpl area = new AreaImpl(parent.getX1() + getGrid().getColOfs(mingp.getX1()),
-                                 parent.getY1() + getGrid().getRowOfs(mingp.getY1()),
-                                 parent.getX1() + getGrid().getColOfs(mingp.getX2()+1) - 1,
-                                 parent.getY1() + getGrid().getRowOfs(mingp.getY2()+1) - 1);
+            Rectangular abspos = getTopology().toPixelPosition(mingp);
+            abspos.move(parent.getX1(), parent.getY1());
+            AreaImpl area = new AreaImpl(abspos);
             area.setPage(sub.getPage());
             //area.setBorders(true, true, true, true);
             area.setLevel(1);

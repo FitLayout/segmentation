@@ -13,6 +13,7 @@ import org.fit.layout.impl.BaseOperator;
 import org.fit.layout.impl.ParameterBoolean;
 import org.fit.layout.impl.ParameterFloat;
 import org.fit.layout.model.Area;
+import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.AreaTree;
 import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
@@ -134,8 +135,7 @@ public class MultiLineOperator extends BaseOperator
      */
     protected void joinAreas(AreaImpl a)
     {
-        if (a.getGrid() == null) //a gird is necessary for this
-            a.createGrid();
+        AreaTopology t = a.getTopology();
         
         boolean change = true;
         while (change)
@@ -143,20 +143,21 @@ public class MultiLineOperator extends BaseOperator
             change = false;
             for (int i = 0; i < a.getChildCount(); i++)
             {
-                final AreaImpl node = (AreaImpl) a.getChildArea(i);
-                final int nx1 = node.getGridPosition().getX1();
-                final int nx2 = node.getGridPosition().getX2();
-                final int ny2 = node.getGridPosition().getY2();
-                
+                AreaImpl node = (AreaImpl) a.getChildArea(i);
+                Rectangular pos = t.getPosition(node);
+                int nx1 = pos.getX1();
+                int nx2 = pos.getX2();
+                int ny2 = pos.getY2();
+
                 //try to expand down - find a neighbor
                 AreaImpl neigh = null;
                 int dist = 1;
-                while (neigh == null && ny2 + dist < a.getGrid().getHeight())
+                while (neigh == null && ny2 + dist < t.getTopologyHeight())
                 {
                     //try to find some node below in the given distance
                     for (int x = nx1; neigh == null && x <= nx2; x++)
                     {
-                        neigh = (AreaImpl) a.getGrid().getAreaAt(x, ny2 + dist);
+                        neigh = (AreaImpl) t.findAreaAt(x, ny2 + dist);
                         if (neigh != null) //something found
                         {
                             if ((!useConsistentStyle || node.hasSameStyle(neigh))
@@ -164,7 +165,7 @@ public class MultiLineOperator extends BaseOperator
                             {
                                 if (verticalJoin(a, node, neigh, true)) //try to join
                                 {
-                                    node.createGrid();
+                                    node.updateTopologies();
                                     change = true;
                                 }
                             }
@@ -226,14 +227,14 @@ public class MultiLineOperator extends BaseOperator
         {
             if (ex1 < ex2) //n1 ends earlier, try to expand n1 to the right
             {
-                if (ex1 < parent.getGrid().getHeight()-1 && canExpandX(parent, n1, ex1+1, n2))
+                if (ex1 < parent.getTopology().getTopologyHeight()-1 && canExpandX(parent, n1, ex1+1, n2))
                     ex1++;
                 else
                     return false; //cannot align - give up
             }
             else if (ex1 > ex2) //n2 ends earlier, try to expand n2 to the right
             {
-                if (ex2 < parent.getGrid().getHeight()-1 && canExpandX(parent, n2, ex2+1, n1))
+                if (ex2 < parent.getTopology().getTopologyHeight()-1 && canExpandX(parent, n2, ex2+1, n1))
                     ex2++;
                 else
                     return false; //cannot align - give up
@@ -264,9 +265,12 @@ public class MultiLineOperator extends BaseOperator
      */
     private boolean canExpandX(AreaImpl parent, AreaImpl node, int x, AreaImpl except)
     {
-        for (int y = node.getGridY(); y < node.getGridY() + node.getGridHeight(); y++)
+        AreaTopology t = parent.getTopology();
+        int gy = t.getPosition(node).getY1();
+        int gh = t.getTopologyHeight();
+        for (int y = gy; y < gy + gh; y++)
         {
-            AreaImpl cand = (AreaImpl) parent.getGrid().getAreaAt(x, y);
+            AreaImpl cand = (AreaImpl) t.findAreaAt(x, y);
             if (cand != null && cand != except)
                 return false; //something found - cannot expand
         }
