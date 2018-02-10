@@ -189,7 +189,7 @@ public class SeparatorSetHVS extends SeparatorSet
         int ret = 0;
         for (int i = 0; i < area.getChildCount(); i++)
         {
-            AreaImpl sub = (AreaImpl) area.getChildArea(i);
+            AreaImpl sub = (AreaImpl) area.getChildAt(i);
             if (filter == null || filter.getBounds().encloses(sub.getBounds()))
             {
                 if (sub.isHorizontalSeparator())

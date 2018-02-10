@@ -40,7 +40,7 @@ public class FlattenTreeOperator extends BaseOperator
     @Override
     public String getDescription()
     {
-        return "This operator flattens the tree: only the root area and the leaf areas are preserved"; //TODO
+        return "This operator flattens the tree: only the root area and the leaf areas are preserved";
     }
 
     @Override
@@ -72,20 +72,20 @@ public class FlattenTreeOperator extends BaseOperator
     
     private void scanAreas(Area root, List<Area> addList, List<Area> removeList)
     {
-        if (root.getParentArea() != null)
+        if (root.getParent() != null)
         {
             if (root.isLeaf())
                 addList.add(root);
             else
                 removeList.add(root);
         }
-        for (Area child : root.getChildAreas())
+        for (Area child : root.getChildren())
             scanAreas(child, addList, removeList);
     }
 
     private void removeAreas(Area root, List<Area> toRemove)
     {
-        List<Area> curChildren = new ArrayList<>(root.getChildAreas());
+        List<Area> curChildren = new ArrayList<>(root.getChildren());
         //call recursively on children
         for (Area child : curChildren)
             removeAreas(child, toRemove);

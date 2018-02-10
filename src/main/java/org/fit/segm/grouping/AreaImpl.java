@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.fit.layout.impl.DefaultArea;
-import org.fit.layout.impl.GenericTreeNode;
 import org.fit.layout.model.Area;
 import org.fit.layout.model.Box;
 import org.fit.layout.model.Box.Type;
@@ -157,8 +155,8 @@ public class AreaImpl extends DefaultArea implements Area
         setGridPosition(pos);
         if (other.getChildCount() > 0)
         {
-            Vector<GenericTreeNode> adopt = new Vector<GenericTreeNode>(other.getChildren());
-            for (Iterator<GenericTreeNode> it = adopt.iterator(); it.hasNext();)
+            List<Area> adopt = new ArrayList<>(other.getChildren());
+            for (Iterator<Area> it = adopt.iterator(); it.hasNext();)
                 appendChild((AreaImpl) it.next());
         }
         join(other, horizontal);
@@ -312,8 +310,8 @@ public class AreaImpl extends DefaultArea implements Area
             return getBackgroundColor();
         else
         {
-            if (getParentArea() != null)
-                return getParentArea().getEffectiveBackgroundColor();
+            if (getParent() != null)
+                return getParent().getEffectiveBackgroundColor();
             else
                 return Color.WHITE; //use white as the default root color
         }
@@ -343,7 +341,7 @@ public class AreaImpl extends DefaultArea implements Area
         else
         {
             for (int i = 0; i < root.getChildCount(); i++)
-                if (recursiveContainsText(root.getChildBox(i)))
+                if (recursiveContainsText(root.getChildAt(i)))
                     return true;
             return false;
         }
@@ -420,7 +418,7 @@ public class AreaImpl extends DefaultArea implements Area
         {
             for (int i = 0; i < root.getChildCount(); i++)
             {
-                ContentObject obj = recursiveGetReplacedContent(root.getChildBox(i));
+                ContentObject obj = recursiveGetReplacedContent(root.getChildAt(i));
                 if (obj != null)
                     return obj;
             }
@@ -487,10 +485,10 @@ public class AreaImpl extends DefaultArea implements Area
     public Area copy()
     {
         Area ret = new AreaImpl(this);
-        if (getParentArea() != null)
+        if (getParent() != null)
         {
-            int ndx = getParentArea().getIndex(this);
-            getParentArea().insertChild(ret, ndx + 1);
+            int ndx = getParent().getIndex(this);
+            getParent().insertChild(ret, ndx + 1);
         }
         return ret;
     }
@@ -639,7 +637,7 @@ public class AreaImpl extends DefaultArea implements Area
             ret = getBoxText();
         else
             for (int i = 0; i < getChildCount(); i++)
-                ret += getChildArea(i).getText();
+                ret += getChildAt(i).getText();
         return ret;
     }
     
@@ -649,11 +647,10 @@ public class AreaImpl extends DefaultArea implements Area
     public List<Area> getChildNodesInside(Rectangular r)
     {
         ArrayList<Area> ret = new ArrayList<>();
-        for (GenericTreeNode child : getChildren())
+        for (Area child : getChildren())
         {
-            Area childarea = (Area) child;
-            if (childarea.getBounds().intersects(r))
-                ret.add(childarea);
+            if (child.getBounds().intersects(r))
+                ret.add(child);
         }
         return ret;
     }
@@ -663,10 +660,9 @@ public class AreaImpl extends DefaultArea implements Area
      */
     public boolean isAreaEmpty(Rectangular r)
     {
-        for (GenericTreeNode child : getChildren())
+        for (Area child : getChildren())
         {
-            Area childarea = (Area) child;
-            if (childarea.getBounds().intersects(r))
+            if (child.getBounds().intersects(r))
                 return false;
         }
         return true;
@@ -703,7 +699,7 @@ public class AreaImpl extends DefaultArea implements Area
      * Removes simple separators from a vector of separators. A simple separator
      * has only one or zero visual areas at each side
      */
-    private void removeSimpleSeparators(Vector<Separator> v)
+    private void removeSimpleSeparators(List<Separator> v)
     {
         //System.out.println("Rem: this="+this);
         for (Iterator<Separator> it = v.iterator(); it.hasNext();)
@@ -852,7 +848,7 @@ public class AreaImpl extends DefaultArea implements Area
         AreaImpl ret = null;
         int maxx = x2;
         int miny = y1;
-        Vector <Box> boxes = getBoxes();
+        List <Box> boxes = getBoxes();
         for (Box box : boxes)
         {
             int bx = box.getBounds().getX1();
@@ -869,7 +865,7 @@ public class AreaImpl extends DefaultArea implements Area
 
         for (int i = 0; i < getChildCount(); i++)
         {
-            AreaImpl child = (AreaImpl) getChildArea(i);
+            AreaImpl child = (AreaImpl) getChildAt(i);
             AreaImpl area = child.recursiveFindAreaAbove(x1, x2, miny, y2);
             if (area != null)
             {   
@@ -932,7 +928,7 @@ public class AreaImpl extends DefaultArea implements Area
 			int cnt = 0;
 			for (int i = 0; i < getChildCount(); i++)
 			{
-				Box child = box.getChildBox(i);
+				Box child = box.getChildAt(i);
 				String text = child.getText().trim();
 				cnt += text.length();
 				sum += getAverageBoxFontSize(child);
@@ -956,7 +952,7 @@ public class AreaImpl extends DefaultArea implements Area
             int cnt = 0;
             for (int i = 0; i < getChildCount(); i++)
             {
-                Box child = box.getChildBox(i);
+                Box child = box.getChildAt(i);
                 String text = child.getText().trim();
                 cnt += text.length();
                 sum += getAverageBoxFontWeight(child);
@@ -980,7 +976,7 @@ public class AreaImpl extends DefaultArea implements Area
             int cnt = 0;
             for (int i = 0; i < getChildCount(); i++)
             {
-                Box child = box.getChildBox(i);
+                Box child = box.getChildAt(i);
                 String text = child.getText().trim();
                 cnt += text.length();
                 sum += getAverageBoxFontStyle(child);

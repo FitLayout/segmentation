@@ -96,14 +96,14 @@ public class AreaUtils
         Vector<Area> selected = new Vector<Area>();
         for (int i = 0; i < root.getChildCount(); i++)
         {
-            final Rectangular pos = root.getChildArea(i).getBounds();
+            final Rectangular pos = root.getChildAt(i).getBounds();
             if (region.enclosesY(pos))
             {
                 //System.out.println("BELONGS " + root.getChildArea(i));
                 if (first == -1)
                     first = i;
                 last = i;
-                selected.add(root.getChildArea(i));
+                selected.add(root.getChildAt(i));
                 if (bounds == null)
                     bounds = new Rectangular(pos);
                 else

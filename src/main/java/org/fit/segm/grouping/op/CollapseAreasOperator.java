@@ -73,20 +73,20 @@ public class CollapseAreasOperator extends BaseOperator
         else
         {
             for (int i = 0; i < root.getChildCount(); i++)
-                recursiveCollapseAreas((AreaImpl) root.getChildArea(i));
+                recursiveCollapseAreas((AreaImpl) root.getChildAt(i));
         }
     }
     
     private boolean canCollapse(AreaImpl area)
     {
-        return (area.getChildCount() == 1 && area.getChildArea(0).isLeaf());
+        return (area.getChildCount() == 1 && area.getChildAt(0).isLeaf());
     }
 
     private void recursiveCollapseSubtree(AreaImpl src, AreaImpl dest)
     {
         for (int i = 0; i < src.getChildCount(); i++)
         {
-            AreaImpl child = (AreaImpl) src.getChildArea(i);
+            AreaImpl child = (AreaImpl) src.getChildAt(i);
             recursiveCollapseSubtree(child, dest);
             dest.joinChild(child);
         }

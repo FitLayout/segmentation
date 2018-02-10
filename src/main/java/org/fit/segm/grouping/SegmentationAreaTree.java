@@ -57,11 +57,11 @@ public class SegmentationAreaTree extends DefaultAreaTree
         rootarea.setPage(page);
         for (int i = 0; i < page.getRoot().getChildCount(); i++)
         {
-            Box cbox = page.getRoot().getChildBox(i);
+            Box cbox = page.getRoot().getChildAt(i);
             Area sub = new AreaImpl(cbox);
             if (sub.getWidth() > 1 || sub.getHeight() > 1)
             {
-                findStandaloneAreas(page.getRoot().getChildBox(i), sub);
+                findStandaloneAreas(page.getRoot().getChildAt(i), sub);
                 rootarea.appendChild(sub);
             }
         }
@@ -106,7 +106,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
         {
             for (int i = 0; i < boxroot.getChildCount(); i++)
             {
-                Box child = boxroot.getChildBox(i);
+                Box child = boxroot.getChildAt(i);
 		        if (child.isVisible())
 		        {
 	                if (isVisuallySeparated(child))
@@ -139,7 +139,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
     {
         root.updateTopologies();
         for (int i = 0; i < root.getChildCount(); i++)
-            createGrids((AreaImpl) root.getChildArea(i));
+            createGrids((AreaImpl) root.getChildAt(i));
     }
 
     public boolean isVisuallySeparated(Box box)
@@ -148,7 +148,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
         if (!box.isVisible()) 
             return false;
         //root box is visually separated
-        else if (box.getParentBox() == null)
+        else if (box.getParent() == null)
             return true;
         //non-empty text boxes are visually separated
         else if (box.getType() == Type.TEXT_CONTENT) 
@@ -206,7 +206,7 @@ public class SegmentationAreaTree extends DefaultAreaTree
     {
         dest.addAll(root.getTags().keySet());
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveGetTags(root.getChildArea(i), dest);
+            recursiveGetTags(root.getChildAt(i), dest);
     }
     
 }

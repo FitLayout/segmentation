@@ -126,7 +126,7 @@ public class FindLineOperator extends BaseOperator
     {
         joinAreas(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveJoinAreas((AreaImpl) root.getChildArea(i));
+            recursiveJoinAreas((AreaImpl) root.getChildAt(i));
     }
     
     /**
@@ -144,7 +144,7 @@ public class FindLineOperator extends BaseOperator
             change = false;
             for (int i = 0; i < a.getChildCount(); i++)
             {
-                AreaImpl node = (AreaImpl) a.getChildArea(i);
+                AreaImpl node = (AreaImpl) a.getChildAt(i);
                 Rectangular pos = t.getPosition(node);
                 int ny1 = pos.getY1();
                 int nx2 = pos.getX2();

@@ -116,7 +116,7 @@ public class SuperAreaOperator extends BaseOperator
     private void recursiveFindSuperAreas(AreaImpl root)
     {
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveFindSuperAreas((AreaImpl) root.getChildArea(i));
+            recursiveFindSuperAreas((AreaImpl) root.getChildAt(i));
         findSuperAreas(root, depthLimit);
     }
     
@@ -139,7 +139,7 @@ public class SuperAreaOperator extends BaseOperator
                 GroupAnalyzer groups = createGroupAnalyzer(root);
                 
                 Vector<Area> chld = new Vector<Area>();
-                chld.addAll(root.getChildAreas());
+                chld.addAll(root.getChildren());
                 while (chld.size() > 1) //we're not going to group a single element
                 {
                     //get the super area

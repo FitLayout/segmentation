@@ -8,6 +8,7 @@ package org.fit.segm.grouping.op;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.fit.layout.model.AreaTopology;
 import org.fit.layout.model.Rectangular;
 import org.fit.segm.grouping.AreaImpl;
 
@@ -60,6 +61,7 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
     {
         //parent.createSeparators();
         seps = parent.getSeparators();
+        AreaTopology t = parent.getTopology();
         
         //starting grid position
         Rectangular gp = new Rectangular(sub.getGridPosition());
@@ -74,7 +76,10 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         Rectangular mingp = null;
         for (int i = 0; i < parent.getChildCount(); i++)
         {
-            AreaImpl chld = (AreaImpl) parent.getChildArea(i);
+            AreaImpl chld = (AreaImpl) parent.getChildAt(i);
+            Rectangular cgp = t.getPosition(chld);
+            if (cgp == null)
+                System.out.println("co?"); //FIXME
             if (gp.encloses(chld.getGridPosition()))
             {
                 selected.add(chld);

@@ -126,7 +126,7 @@ public class MultiLineOperator extends BaseOperator
     {
         joinAreas(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveJoinAreas((AreaImpl) root.getChildArea(i));
+            recursiveJoinAreas((AreaImpl) root.getChildAt(i));
     }
     
     /**
@@ -143,7 +143,7 @@ public class MultiLineOperator extends BaseOperator
             change = false;
             for (int i = 0; i < a.getChildCount(); i++)
             {
-                AreaImpl node = (AreaImpl) a.getChildArea(i);
+                AreaImpl node = (AreaImpl) a.getChildAt(i);
                 Rectangular pos = t.getPosition(node);
                 int nx1 = pos.getX1();
                 int nx2 = pos.getX2();

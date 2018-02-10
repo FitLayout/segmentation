@@ -70,6 +70,6 @@ public class GroupByDOMOperator extends SuperAreaOperator
         if (root.getChildCount() > 1)
             findSuperAreas(root, 1);
         for (int i = 0; i < root.getChildCount(); i++)
-            groupByDOM((AreaImpl) root.getChildArea(i));
+            groupByDOM((AreaImpl) root.getChildAt(i));
     }
 }

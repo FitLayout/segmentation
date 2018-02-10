@@ -76,7 +76,7 @@ public class SortByLinesOperator extends SortByPositionOperator
     {
         sortChildLines(root);
         for (int i = 0; i < root.getChildCount(); i++)
-            recursiveSortLines((AreaImpl) root.getChildArea(i));
+            recursiveSortLines((AreaImpl) root.getChildAt(i));
     }
     
     /**
@@ -87,7 +87,7 @@ public class SortByLinesOperator extends SortByPositionOperator
     {
         if (root.getChildCount() > 1)
         {
-            List<Area> src = new Vector<Area>(root.getChildAreas());
+            List<Area> src = new Vector<Area>(root.getChildren());
             List<Area> dest = new Vector<Area>(src.size());
             while (!src.isEmpty())
             {

@@ -70,7 +70,7 @@ public class HomogeneousLeafOperator extends SuperAreaOperator
         if (root.getChildCount() > 1)
             findSuperAreas(root, 1);
         for (int i = 0; i < root.getChildCount(); i++)
-            findHomogeneousLeaves((AreaImpl) root.getChildArea(i));
+            findHomogeneousLeaves((AreaImpl) root.getChildAt(i));
     }
     
 

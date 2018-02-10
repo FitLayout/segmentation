@@ -97,7 +97,7 @@ public class SortByPositionOperator extends BaseOperator
     {
         if (root.getChildCount() > 1)
         {
-            Vector<Area> list = new Vector<Area>(root.getChildAreas());
+            Vector<Area> list = new Vector<Area>(root.getChildren());
             Collections.sort(list, new Comparator<Area>() {
                 public int compare(Area a1, Area a2)
                 {
@@ -112,7 +112,7 @@ public class SortByPositionOperator extends BaseOperator
             root.appendChildren(list);
         }
         for (int i = 0; i < root.getChildCount(); i++)
-            recursivelySortChildAreas(root.getChildArea(i), columnFirst);
+            recursivelySortChildAreas(root.getChildAt(i), columnFirst);
         
     }
 

@@ -35,7 +35,7 @@ public class GroupAnalyzerByDOM extends GroupAnalyzer
             Rectangular mingp = null;
             for (int i = 0; i < parent.getChildCount(); i++)
             {
-                AreaImpl chld = (AreaImpl) parent.getChildArea(i);
+                AreaImpl chld = (AreaImpl) parent.getChildAt(i);
                 Integer cid = getId(chld);
                 if (cid != null && cid.equals(srcId))
                 {
