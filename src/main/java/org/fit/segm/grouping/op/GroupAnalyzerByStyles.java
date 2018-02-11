@@ -76,17 +76,15 @@ public class GroupAnalyzerByStyles extends GroupAnalyzer
         Rectangular mingp = null;
         for (int i = 0; i < parent.getChildCount(); i++)
         {
-            AreaImpl chld = (AreaImpl) parent.getChildAt(i);
-            Rectangular cgp = t.getPosition(chld);
-            if (cgp == null)
-                System.out.println("co?"); //FIXME
-            if (gp.encloses(chld.getGridPosition()))
+            final AreaImpl chld = (AreaImpl) parent.getChildAt(i);
+            final Rectangular cgp = t.getPosition(chld);
+            if (gp.encloses(cgp))
             {
                 selected.add(chld);
                 if (mingp == null)
-                    mingp = new Rectangular(chld.getGridPosition());
+                    mingp = new Rectangular(cgp);
                 else
-                    mingp.expandToEnclose(chld.getGridPosition());
+                    mingp.expandToEnclose(cgp);
             }
         }
         

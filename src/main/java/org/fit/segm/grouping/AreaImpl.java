@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author radek
  */
-public class AreaImpl extends DefaultArea implements Area
+public class AreaImpl extends DefaultArea
 {
     private static Logger log = LoggerFactory.getLogger(AreaImpl.class);
     
