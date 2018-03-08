@@ -865,20 +865,23 @@ public class AreaImpl extends DefaultArea
 
         for (int i = 0; i < getChildCount(); i++)
         {
-            AreaImpl child = (AreaImpl) getChildAt(i);
-            AreaImpl area = child.recursiveFindAreaAbove(x1, x2, miny, y2);
-            if (area != null)
-            {   
-                int bx = area.getX1(); 
-                int by = area.getY2();
-                int len = area.getText().length();
-                if ((len > 0) && //we require some text in the area
-                        (by > miny ||
-                         (by == miny && bx < maxx)))
-                {
-                    ret = area;
-                    if (bx < maxx) maxx = bx;
-                    if (by > miny) miny = by;
+            Area child = getChildAt(i);
+            if (child instanceof AreaImpl)
+            {
+                AreaImpl area = ((AreaImpl) child).recursiveFindAreaAbove(x1, x2, miny, y2);
+                if (area != null)
+                {   
+                    int bx = area.getX1(); 
+                    int by = area.getY2();
+                    int len = area.getText().length();
+                    if ((len > 0) && //we require some text in the area
+                            (by > miny ||
+                             (by == miny && bx < maxx)))
+                    {
+                        ret = area;
+                        if (bx < maxx) maxx = bx;
+                        if (by > miny) miny = by;
+                    }
                 }
             }
         }

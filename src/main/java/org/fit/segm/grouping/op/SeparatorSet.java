@@ -319,7 +319,11 @@ public abstract class SeparatorSet
     {
         bsep = new Vector<Separator>();
         for (int i = 0; i < root.getChildCount(); i++)
-            analyzeAreaSeparators((AreaImpl) root.getChildAt(i));
+        {
+            Area child = root.getChildAt(i);
+            if (child instanceof AreaImpl)
+            analyzeAreaSeparators((AreaImpl) child);
+        }
     }
     
     /**
